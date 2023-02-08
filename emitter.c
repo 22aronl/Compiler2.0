@@ -20,6 +20,7 @@ void emit(emitter_t* emitter, char* instruction)
 void emit_number(emitter_t* emitter, char* instruction, uint64_t number)
 {
     printf(instruction, number);
+    printf("\n");
 }
 
 int16_t get_offset(emitter_t* emitter, Slice* var)
@@ -50,7 +51,6 @@ void emit_start_function(emitter_t* emitter, Slice* name)
     emit_name(emitter, name);
     emit(emitter, "pushq %rbp");
     emit(emitter, "movq %rsp, %rbp");
-    printf("YESSSS:)");
 }
 
 void emit_end_function(emitter_t* emitter)

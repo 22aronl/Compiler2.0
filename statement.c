@@ -39,12 +39,10 @@ void free_map(struct map *map)
 void declare_function(emitter_t *emitter, struct declare *declare)
 {
     emit_start_function(emitter, declare->name);
-    printf("declaring map");
 
     struct map* new_map = create_map();
     emitter->var_map = new_map;
     for(uint16_t i = 0; i < declare->args; i++) {
-        printf("declaring vars");
         declare_variable(emitter, &declare->parameters[i], i);
     }
 
@@ -90,7 +88,7 @@ void compile_statement(emitter_t *emitter, statement *s)
     case s_return:
         compile_expression(emitter, s->internal->return_statement->expr);
         pop_register(emitter, "rax");
-        emit(emitter, "retq");
+        emit_end_function(emitter);
         break;
     }
 }

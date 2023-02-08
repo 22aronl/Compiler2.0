@@ -659,6 +659,7 @@ void run_compile(Interpreter* in) {
     bool continue_parsing = true;
     struct map map = {in->symbol_table, in->visited, MAX_SYMBOLS, true};
     uint64_t return_value = 0;
+    set_up_assembly(em);
     while (true)
     {
         statement *state = parse_statement(in, &continue_parsing);
