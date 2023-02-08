@@ -1,10 +1,9 @@
 #include <stdint.h>
 #include "slice2.h"
 #include "hashmap.h"
+#include "main.h"
 
-typedef struct {
-    struct map* var_map;
-} emitter_t;
+
 
 /**
  * pushes register name onto stack

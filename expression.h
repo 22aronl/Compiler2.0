@@ -4,7 +4,6 @@
 #include "main.h"
 #include "slice2.h"
 #include "hashmap.h"
-#include "emitter.h"
 //#include "statement.h"
 
 enum type_of

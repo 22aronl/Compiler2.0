@@ -28,6 +28,10 @@ typedef struct function_table
     struct declare* bins;
 } hash_map_func;
 
+typedef struct {
+    struct map* var_map;
+} emitter_t;
+
 typedef struct
 {
     char const *const program;

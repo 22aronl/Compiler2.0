@@ -656,8 +656,8 @@ void free_interpreter_internal(Interpreter *in)
 
 void run_compile(Interpreter* in) {
     expression* exp = parse_expression(in);
-    emitter* em = {};
-    compile_expression(&em, exp);
+    emitter_t* em = {NULL};
+    compile_expression(em, exp);
 
 }
 
