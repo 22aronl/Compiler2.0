@@ -12,8 +12,8 @@ void compile(emitter_t* emitter, expression* e) {
     switch (e->type)
     {
     case t_not:
-        compile(emit, e->left);
-        pop_register(emit, "rax");
+        compile(emitter, e->left);
+        pop_register(emitter, "rax");
         emit(emitter, "negq \%rax");
         push_register(emitter, "rax");
         break;

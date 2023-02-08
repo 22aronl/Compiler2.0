@@ -4,6 +4,7 @@
 #include "main.h"
 #include "slice2.h"
 #include "hashmap.h"
+#include "emitter.h"
 //#include "statement.h"
 
 enum type_of
@@ -50,4 +51,3 @@ void compile(emitter_t*, expression*);
 
 void free_expression(expression*);
 uint64_t eval_expr(Interpreter*, struct map*, expression*);
-void compile(expression*);
