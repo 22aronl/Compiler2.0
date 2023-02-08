@@ -685,6 +685,8 @@ void run(Interpreter *in)
 
 int main(int argc, const char *const *const argv)
 {
+    fprintf(stdout, "hiii %d", argc);
+    fprintf(stdout, "s%s", argv[0]);
     printf("HI %d", argc);
     if (argc != 2)
     {
