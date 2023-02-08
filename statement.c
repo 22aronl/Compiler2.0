@@ -6,13 +6,64 @@
 #include "main.h"
 #include "hashmap.h"
 #include "expression.h"
+#include "emitter.h"
+
+/**
+ * Creates an interanl map to be used in a function
+ */
+struct map *create_map()
+{
+    struct map *map = malloc(sizeof(struct map));
+    map->map = malloc(MAX_SYMBOLS_FOR_FUNC * sizeof(hash_map));
+    map->visited = malloc(MAX_SYMBOLS_FOR_FUNC * sizeof(bool));
+    memset(map->visited, 0, MAX_SYMBOLS_FOR_FUNC * sizeof(bool));
+    map->size = MAX_SYMBOLS_FOR_FUNC;
+    map->main = false;
+    return map;
+}
+
+/**
+ * Frees all the memory of the map
+ */
+void free_map(struct map *map)
+{
+    for (uint32_t i = 0; i < map->size; i++)
+    {
+        if (map->visited[i])
+        {
+            free(map->map[i].bins);
+        }
+    }
+}
+
+void declare_function(emitter_t *emitter, struct declare *declare)
+{
+    emit_start_function(emitter, declare->name);
+    printf("declaring map");
+
+    struct map* new_map = create_map();
+    emitter->var_map = new_map;
+    for(uint16_t i = 0; i < declare->args; i++) {
+        printf("declaring vars");
+        declare_variable(emitter, &declare->parameters[i], i);
+    }
+
+    for(uint32_t i = 0; i < declare->size_body; i++) {
+        compile_statement(emitter, declare->body[i]);
+    }
+    free_map(new_map);
+    free(new_map->map);
+    free(new_map->visited);
+    free(new_map);
+    emit_end_function(emitter);
+}
 
 void compile_statement(emitter_t *emitter, statement *s)
 {
     switch (s->type)
     {
     case s_declare:
-        // PANICCCCCCCCCC
+        declare_function(emitter, s->internal->declare);
         break;
     case s_func:
         // PANICCCCCC
@@ -112,33 +163,6 @@ void free_statement(statement *s)
     free(s);
 }
 
-/**
- * Creates an interanl map to be used in a function
- */
-struct map *create_map()
-{
-    struct map *map = malloc(sizeof(struct map));
-    map->map = malloc(MAX_SYMBOLS_FOR_FUNC * sizeof(hash_map));
-    map->visited = malloc(MAX_SYMBOLS_FOR_FUNC * sizeof(bool));
-    memset(map->visited, 0, MAX_SYMBOLS_FOR_FUNC * sizeof(bool));
-    map->size = MAX_SYMBOLS_FOR_FUNC;
-    map->main = false;
-    return map;
-}
-
-/**
- * Frees all the memory of the map
- */
-void free_map(struct map *map)
-{
-    for (uint32_t i = 0; i < map->size; i++)
-    {
-        if (map->visited[i])
-        {
-            free(map->map[i].bins);
-        }
-    }
-}
 
 /**
  * Recursively evaluates a function by loading all the parameters into a new map and then evaluating the body

@@ -28,3 +28,10 @@ int16_t get_offset(emitter_t*, Slice* var);
 void emit_number(emitter_t* emitter, char* instruction, uint64_t number);
 
 void push_variable(emitter_t* emitter, Slice* var, char* reg);
+
+
+void emit_start_function(emitter_t* emitter, Slice* name);
+
+void emit_end_function(emitter_t* emitter);
+
+void declare_variable(emitter_t* emitter, Slice* var, int16_t index);

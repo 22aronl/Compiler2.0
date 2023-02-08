@@ -26,6 +26,46 @@ uint16_t get_map_offset(struct map* map, Slice* key) {
     return 0;
 }
 
+void add_map_offset(struct map* map, Slice* key, uint32_t value) {
+
+    bool *visited = map->visited;
+    hash_map *symbol_table = map->map;
+    uint32_t size = map->size;
+
+
+    int hash = sliceHash(key) % size;
+    if (visited[hash])
+    {
+        struct symbol_table *table = &symbol_table[hash];
+        for (int i = 0; i < table->cur; i++)
+        {
+            if (slice_eq2(table->bins[i].key, key))
+            {
+                table->bins[i].value = value;
+                return;
+            }
+        }
+        // doubles the current bin if it is full
+        if (table->cur == table->size)
+        {
+            table->size *= 2;
+            table->bins = realloc(table->bins, table->size * sizeof(struct bin));
+        }
+        table->bins[table->cur].key = key;
+        table->bins[table->cur].value = value;
+        table->cur += 1;
+    }
+    else
+    {
+        visited[hash] = true;
+        symbol_table[hash].size = 2;
+        symbol_table[hash].cur = 1;
+        symbol_table[hash].bins = malloc(2 * sizeof(struct bin));
+        symbol_table[hash].bins[0].key = key;
+        symbol_table[hash].bins[0].value = value;
+    }
+}
+
 /**
  * Checks if a key existins in a given map
 */

@@ -17,6 +17,7 @@ struct map {
 
 
 uint16_t get_map_offset(struct map*, Slice* var);
+void add_map_offset(struct map*, Slice*, uint32_t);
 
 void addSymbol(Interpreter*, struct map*, Slice*, uint64_t, bool force_local);
 uint64_t getSymbol(Interpreter*, struct map*, Slice *);

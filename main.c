@@ -655,9 +655,25 @@ void free_interpreter_internal(Interpreter *in)
 }
 
 void run_compile(Interpreter* in) {
-    expression* exp = parse_expression(in);
     emitter_t* em = {NULL};
-    compile_expression(em, exp);
+    bool continue_parsing = true;
+    struct map map = {in->symbol_table, in->visited, MAX_SYMBOLS, true};
+    uint64_t return_value = 0;
+    while (true)
+    {
+        statement *state = parse_statement(in, &continue_parsing);
+        if (!continue_parsing)
+        {
+            break;
+        }
+        compile_statement(em, state);
+        add_statement(in, state);
+    }
+
+    // frees all the memory
+    clear_ast(in);
+    free_interpreter_internal(in);
+    end_or_fail(in);
 
 }
 

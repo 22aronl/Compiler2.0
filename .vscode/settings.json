@@ -3,6 +3,8 @@
         "slice2.h": "c",
         "typeinfo": "c",
         "iterator": "c",
-        "memory": "c"
+        "memory": "c",
+        "__tree": "c",
+        "map": "c"
     }
 }
