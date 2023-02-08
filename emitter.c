@@ -7,7 +7,7 @@ void push_register(emitter_t* emitter, char* name)
 
 void pop_register(emitter_t* emitter,char* name)
 {
-    printf("popq \%%s\n", name);
+    printf("popq \%s\n", name);
 }
 
 void emit(emitter_t* emitter, char* instruction)
