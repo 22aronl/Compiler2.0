@@ -35,3 +35,6 @@ void emit_start_function(emitter_t* emitter, Slice* name);
 void emit_end_function(emitter_t* emitter);
 
 void declare_variable(emitter_t* emitter, Slice* var, int16_t index);
+
+void set_up_assembly(emitter_t* emitter);
+
