@@ -8,53 +8,129 @@
 #include "statement.h"
 #include "emitter.h"
 
-void compile(emitter_t* emitter, expression* e) {
+void compile_expression(emitter_t* emitter, expression* e) {
     switch (e->type)
     {
     case t_not:
-        compile(emitter, e->left);
+        compile_expression(emitter, e->left);
         pop_register(emitter, "rax");
         emit(emitter, "negq \%rax");
         push_register(emitter, "rax");
         break;
     case t_star:
-        compile(emitter, e->left);
-        compile(emitter, e->right);
+        compile_expression(emitter, e->left);
+        compile_expression(emitter, e->right);
         pop_register(emitter, "rax");
         pop_register(emitter, "rbx");
         emit(emitter, "imul \%rbx, \%rax");
         push_register(emitter, "rax");
         break;
     case t_divide:
-        compile(emitter, e->left);
-        compile(emitter, e->right);
+        compile_expression(emitter, e->left);
+        compile_expression(emitter, e->right);
         pop_register(emitter, "rax");
         pop_register(emitter, "rbx");
         emit(emitter, "idiv \%rbx");
         push_register(emitter, "rbx");
         break;
     case t_mod:
-        compile(emitter, e->left);
-        compile(emitter, e->right);
+        compile_expression(emitter, e->left);
+        compile_expression(emitter, e->right);
         pop_register(emitter, "rax");
         pop_register(emitter, "rbx");
         emit(emitter, "idiv \%rbx");
         push_register(emitter, "rax");
         break;
     case t_plus:
-        compile(emitter, e->left);
-        compile(emitter, e->right);
+        compile_expression(emitter, e->left);
+        compile_expression(emitter, e->right);
         pop_register(emitter, "rax");
         pop_register(emitter, "rbx");
         emit(emitter, "add \%rbx, \%rax");
         push_register(emitter, "rax");
         break;
     case t_minus:
-        compile(emitter, e->left);
-        compile(emitter, e->right);
+        compile_expression(emitter, e->left);
+        compile_expression(emitter, e->right);
         pop_register(emitter, "rax");
         pop_register(emitter, "rbx");
         emit(emitter, "sub \%rbx, \%rax");
+        push_register(emitter, "rax");
+        break;
+    case t_l:
+        compile_expression(emitter, e->left);
+        compile_expression(emitter, e->right);
+        pop_register(emitter, "rax");
+        pop_register(emitter, "rbx");
+        emit(emitter, "cmp \%rbx, \%rax");
+        emit(emitter, "setl \%al");
+        emit(emitter, "movzbq \%al, \%rax");
+        push_register(emitter, "rax");
+        break;
+    case t_g:
+        compile_expression(emitter, e->left);
+        compile_expression(emitter, e->right);
+        pop_register(emitter, "rax");
+        pop_register(emitter, "rbx");
+        emit(emitter, "cmp \%rbx, \%rax");
+        emit(emitter, "setg \%al");
+        emit(emitter, "movzbq \%al, \%rax");
+        push_register(emitter, "rax");
+        break;
+    case t_lt:
+        compile_expression(emitter, e->left);
+        compile_expression(emitter, e->right);
+        pop_register(emitter, "rax");
+        pop_register(emitter, "rbx");
+        emit(emitter, "cmp \%rbx, \%rax");
+        emit(emitter, "setle \%al");
+        emit(emitter, "movzbq \%al, \%rax");
+        push_register(emitter, "rax");
+        break;
+    case t_gt:
+        compile_expression(emitter, e->left);
+        compile_expression(emitter, e->right);
+        pop_register(emitter, "rax");
+        pop_register(emitter, "rbx");
+        emit(emitter, "cmp \%rbx, \%rax");
+        emit(emitter, "setge \%al");
+        emit(emitter, "movzbq \%al, \%rax");
+        push_register(emitter, "rax");
+        break;
+    case t_eq:
+        compile_expression(emitter, e->left);
+        compile_expression(emitter, e->right);
+        pop_register(emitter, "rax");
+        pop_register(emitter, "rbx");
+        emit(emitter, "cmp \%rbx, \%rax");
+        emit(emitter, "sete \%al");
+        emit(emitter, "movzbq \%al, \%rax");
+        push_register(emitter, "rax");
+        break;
+    case t_neq:
+        compile_expression(emitter, e->left);
+        compile_expression(emitter, e->right);
+        pop_register(emitter, "rax");
+        pop_register(emitter, "rbx");
+        emit(emitter, "cmp \%rbx, \%rax");
+        emit(emitter, "setne \%al");
+        emit(emitter, "movzbq \%al, \%rax");
+        push_register(emitter, "rax");
+        break;
+    case t_and:
+        compile_expression(emitter, e->left);
+        compile_expression(emitter, e->right);
+        pop_register(emitter, "rax");
+        pop_register(emitter, "rbx");
+        emit(emitter, "and \%rbx, \%rax");
+        push_register(emitter, "rax");
+        break;
+    case t_or:
+        compile_expression(emitter, e->left);
+        compile_expression(emitter, e->right);
+        pop_register(emitter, "rax");
+        pop_register(emitter, "rbx");
+        emit(emitter, "or \%rbx, \%rax");
         push_register(emitter, "rax");
         break;
     case t_num:
@@ -64,6 +140,18 @@ void compile(emitter_t* emitter, expression* e) {
     case t_var:
         emit_number(emitter, "movq %d(\%rbp), \%rax", get_offset(emitter, e->character->name));
         push_register(emitter, "rax");
+        break;
+    case t_func:
+        emit(emitter, "PANICCCC implement t_func");
+        break;
+    case t_print:
+        compile_expression(emitter, e->left);
+        pop_register(emitter, "rax");
+        emit(emitter, "mov %rax, %rsi");
+        emit(emitter, "mov $0, %rax");
+        emit(emitter, "lea format(%rip),%rdi");
+        emit(emitter, ".extern printf");
+        emit(emitter, "call printf");
         break;
     default:
         emit(emitter, "implement later");

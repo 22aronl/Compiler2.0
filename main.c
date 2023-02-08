@@ -657,7 +657,7 @@ void free_interpreter_internal(Interpreter *in)
 void run_compile(Interpreter* in) {
     expression* exp = parse_expression(in);
     emitter_t* em = {NULL};
-    compile(em, exp);
+    compile_expression(em, exp);
 
 }
 
@@ -685,9 +685,9 @@ void run(Interpreter *in)
 
 int main(int argc, const char *const *const argv)
 {
-    fprintf(stdout, "hiii %d", argc);
-    fprintf(stdout, "s%s", argv[0]);
-    printf("HI %d", argc);
+    // fprintf(stdout, "hiii %d", argc);
+    // fprintf(stdout, "s%s", argv[0]);
+    // printf("HI %d", argc);
     if (argc != 2)
     {
         fprintf(stderr, "usage: %s <file name>\n", argv[0]);

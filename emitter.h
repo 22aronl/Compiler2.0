@@ -26,3 +26,5 @@ void emit(emitter_t*, char* instruction);
 int16_t get_offset(emitter_t*, Slice* var);
 
 void emit_number(emitter_t* emitter, char* instruction, uint64_t number);
+
+void push_variable(emitter_t* emitter, Slice* var, char* reg);

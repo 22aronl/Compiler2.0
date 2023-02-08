@@ -81,6 +81,8 @@ struct statement
     enum type_of_s type;
 };
 
+void compile_statement(emitter_t*, statement*);
+
 void free_function(struct func *func);
 void free_statement(statement *s);
 bool evaluate_statement(Interpreter *in, struct map *map, statement *s, uint64_t *return_value);

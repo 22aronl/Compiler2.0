@@ -1,5 +1,8 @@
 {
     "files.associations": {
-        "slice2.h": "c"
+        "slice2.h": "c",
+        "typeinfo": "c",
+        "iterator": "c",
+        "memory": "c"
     }
 }

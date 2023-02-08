@@ -7,9 +7,46 @@
 #include "hashmap.h"
 #include "expression.h"
 
+void compile_statement(emitter_t *emitter, statement *s)
+{
+    switch (s->type)
+    {
+    case s_declare:
+        // PANICCCCCCCCCC
+        break;
+    case s_func:
+        // PANICCCCCC
+        break;
+    case s_var:
+        compile_expression(emitter, s->internal->var->expr);
+        pop_register(emitter, "rax");
+        push_variable(emitter, s->internal->var->name, "rax");
+        break;
+    case s_print:
+        compile_expression(emitter, s->internal->print->expr);
+        emit(emitter, "mov %rax, %rsi");
+        emit(emitter, "mov $0, %rax");
+        emit(emitter, "lea format(%rip),%rdi");
+        emit(emitter, ".extern printf");
+        emit(emitter, "call printf");
+        break;
+    case s_if:
+        // PANICCC AGAIN
+        break;
+    case s_while:
+        // PANICCCCAA
+        break;
+    case s_return:
+        compile_expression(emitter, s->internal->return_statement->expr);
+        pop_register(emitter, "rax");
+        emit(emitter, "retq");
+        break;
+    }
+}
+
 /**
  * Frees a function struct of all its memory
-*/
+ */
 void free_function(struct func *func)
 {
     free(func->name);
@@ -21,7 +58,7 @@ void free_function(struct func *func)
 
 /**
  * frees a statement struct of all its memory (recursively)
-*/
+ */
 void free_statement(statement *s)
 {
     switch (s->type)
@@ -77,7 +114,7 @@ void free_statement(statement *s)
 
 /**
  * Creates an interanl map to be used in a function
-*/
+ */
 struct map *create_map()
 {
     struct map *map = malloc(sizeof(struct map));
@@ -91,10 +128,13 @@ struct map *create_map()
 
 /**
  * Frees all the memory of the map
-*/
-void free_map(struct map* map) {
-    for(uint32_t i = 0; i < map->size; i++) {
-        if(map->visited[i]) {
+ */
+void free_map(struct map *map)
+{
+    for (uint32_t i = 0; i < map->size; i++)
+    {
+        if (map->visited[i])
+        {
             free(map->map[i].bins);
         }
     }
@@ -102,7 +142,7 @@ void free_map(struct map* map) {
 
 /**
  * Recursively evaluates a function by loading all the parameters into a new map and then evaluating the body
-*/
+ */
 uint64_t evaluate_function(Interpreter *in, struct map *map, struct func *func, struct declare *declare)
 {
     struct map *new_map = create_map();
@@ -126,7 +166,7 @@ uint64_t evaluate_function(Interpreter *in, struct map *map, struct func *func, 
 
 /**
  * Evaluates a statement by calling the correct function
-*/
+ */
 bool evaluate_statement(Interpreter *in, struct map *map, statement *s, uint64_t *return_value)
 {
     switch (s->type)
@@ -144,10 +184,10 @@ bool evaluate_statement(Interpreter *in, struct map *map, statement *s, uint64_t
         printf("%" PRIu64 "\n", eval_expr(in, map, s->internal->print->expr));
         break;
     case s_if:
-        if (eval_expr(in, map, s->internal->if_statement->condition)) //Code evaluation for if statement
+        if (eval_expr(in, map, s->internal->if_statement->condition)) // Code evaluation for if statement
         {
             for (uint32_t i = 0; i < s->internal->if_statement->size_body; i++)
-                if (!evaluate_statement(in, map, s->internal->if_statement->body[i], return_value)) //If there is a return value, it should terimnate out
+                if (!evaluate_statement(in, map, s->internal->if_statement->body[i], return_value)) // If there is a return value, it should terimnate out
                     return false;
         }
         else if (s->internal->if_statement->has_else)
@@ -160,7 +200,7 @@ bool evaluate_statement(Interpreter *in, struct map *map, statement *s, uint64_t
     case s_while:
         while (eval_expr(in, map, s->internal->while_statement->condition))
             for (uint32_t i = 0; i < s->internal->while_statement->size_body; i++)
-                if (!evaluate_statement(in, map, s->internal->while_statement->body[i], return_value)) //If there is a return value, it should terimnate out
+                if (!evaluate_statement(in, map, s->internal->while_statement->body[i], return_value)) // If there is a return value, it should terimnate out
                     return false;
         break;
     case s_return:
