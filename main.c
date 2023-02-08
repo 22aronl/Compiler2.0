@@ -685,7 +685,7 @@ void run(Interpreter *in)
 
 int main(int argc, const char *const *const argv)
 {
-
+    printf("HI %d", argc);
     if (argc != 2)
     {
         fprintf(stderr, "usage: %s <file name>\n", argv[0]);

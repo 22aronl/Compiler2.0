@@ -2,7 +2,7 @@
 #include <string.h>
 #include <stdlib.h>
 
- int main() {
+ int main1() {
      // reads the fun program from stdin
      puts("    .data");
      puts("format: .byte '%', 'd', 10, 0");

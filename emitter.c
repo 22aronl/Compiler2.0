@@ -3,7 +3,6 @@
 void push_register(emitter_t* emitter, char* name)
 {
     printf("pushq \%s\n", name);
-    puts("hello");
 }
 
 void pop_register(emitter_t* emitter,char* name)
