@@ -7,6 +7,25 @@
 #include "main.h"
 #include "statement.h"
 
+uint16_t get_map_offset(struct map* map, Slice* key) {
+    bool* visited = map->visited;
+    hash_map* symbol_table = map->map;
+    uint32_t size = map->size;
+    int hash = sliceHash(key) % size;
+    if (visited[hash])
+    {
+        struct symbol_table *table = &symbol_table[hash];
+        for (int i = 0; i < table->cur; i++)
+        {
+            if (slice_eq2(table->bins[i].key, key))
+            {
+                return 1;
+            }
+        }
+    }
+    return 0;
+}
+
 /**
  * Checks if a key existins in a given map
 */

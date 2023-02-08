@@ -14,6 +14,7 @@
 #include "main.h"
 #include "expression.h"
 #include "statement.h"
+#include "emitter.h"
 
 expression *parse_expression(Interpreter *in);
 statement *parse_statement(Interpreter *in, bool *effects);
@@ -653,6 +654,13 @@ void free_interpreter_internal(Interpreter *in)
     free(in->function_table);
 }
 
+void run_compile(Interpreter* in) {
+    expression* exp = parse_expression(in);
+    emitter* em = {};
+    compile_expression(&em, exp);
+
+}
+
 void run(Interpreter *in)
 {
     bool continue_parsing = true;
@@ -717,7 +725,8 @@ int main(int argc, const char *const *const argv)
 
     Interpreter x = createInterpreter(prog);
 
-    run(&x);
+    // run(&x);
+    run_compile(&x);
 
     return 0;
 }

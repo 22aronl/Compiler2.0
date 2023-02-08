@@ -46,5 +46,8 @@ struct expression {
     enum type_of type;
 };
 
+void compile(emitter_t*, expression*);
+
 void free_expression(expression*);
 uint64_t eval_expr(Interpreter*, struct map*, expression*);
+void compile(expression*);

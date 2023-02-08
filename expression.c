@@ -6,6 +6,70 @@
 #include "expression.h"
 #include "hashmap.h"
 #include "statement.h"
+#include "emitter.h"
+
+void compile(emitter_t* emitter, expression* e) {
+    switch (e->type)
+    {
+    case t_not:
+        compile(emit, e->left);
+        pop_register(emit, "rax");
+        emit(emitter, "negq \%rax");
+        push_register(emitter, "rax");
+        break;
+    case t_star:
+        compile(emitter, e->left);
+        compile(emitter, e->right);
+        pop_register(emitter, "rax");
+        pop_register(emitter, "rbx");
+        emit(emitter, "imul \%rbx, \%rax");
+        push_register(emitter, "rax");
+        break;
+    case t_divide:
+        compile(emitter, e->left);
+        compile(emitter, e->right);
+        pop_register(emitter, "rax");
+        pop_register(emitter, "rbx");
+        emit(emitter, "idiv \%rbx");
+        push_register(emitter, "rbx");
+        break;
+    case t_mod:
+        compile(emitter, e->left);
+        compile(emitter, e->right);
+        pop_register(emitter, "rax");
+        pop_register(emitter, "rbx");
+        emit(emitter, "idiv \%rbx");
+        push_register(emitter, "rax");
+        break;
+    case t_plus:
+        compile(emitter, e->left);
+        compile(emitter, e->right);
+        pop_register(emitter, "rax");
+        pop_register(emitter, "rbx");
+        emit(emitter, "add \%rbx, \%rax");
+        push_register(emitter, "rax");
+        break;
+    case t_minus:
+        compile(emitter, e->left);
+        compile(emitter, e->right);
+        pop_register(emitter, "rax");
+        pop_register(emitter, "rbx");
+        emit(emitter, "sub \%rbx, \%rax");
+        push_register(emitter, "rax");
+        break;
+    case t_num:
+        emit_number(emitter, "movq $%d, \%rax", e->character->value);
+        push_register(emitter, "rax");
+        break;
+    case t_var:
+        emit_number(emitter, "movq %d(\%rbp), \%rax", get_offset(emitter, e->character->name));
+        push_register(emitter, "rax");
+        break;
+    default:
+        emit(emitter, "implement later");
+        break;
+    }
+}
 
 /**
  * Recursively frees up expression memory
