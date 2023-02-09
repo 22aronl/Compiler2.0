@@ -51,3 +51,5 @@ bool align_stack(emitter_t *emitter);
 bool align_stack_function(emitter_t *emitter, int16_t offset);
 
 void realign_stack(emitter_t *emitter, bool change);
+
+void add_rsp(emitter_t *emitter);
