@@ -2,14 +2,32 @@
 
 #include "emitter.h"
 
+void sub_rsp(emitter_t * emitter) {
+    emitter->stack_pointer += 8;
+}
+
+void add_rsp(emitter_t * emitter) {
+    emitter->stack_pointer -= 8;
+}
+
+void align_stack(emitter_t *emitter)
+{
+    if (emitter->stack_pointer % 16 != 0)
+    {
+        printf("subq $8, %%rsp\n");
+    }
+}
+
 void push_register(emitter_t *emitter, char *name)
 {
     printf("pushq %%%s\n", name);
+    sub_rsp(emitter);
 }
 
 void pop_register(emitter_t *emitter, char *name)
 {
     printf("popq %%%s\n", name);
+    add_rsp(emitter);
 }
 
 void emit(emitter_t *emitter, char *instruction)
@@ -52,6 +70,7 @@ void emit_start_function(emitter_t *emitter, Slice *name)
     emit_name(emitter, "%.*s:\n", name);
     emit(emitter, "pushq %rbp");
     emit(emitter, "movq %rsp, %rbp");
+    sub_rsp(emitter);
 }
 
 void emit_end_function(emitter_t *emitter)
@@ -65,6 +84,7 @@ void declare_variable(emitter_t *emitter, Slice *var, int16_t index)
 {
     add_map_offset(emitter->var_map, var, index);
     emit(emitter, "sub $8, %rsp");
+    sub_rsp(emitter);
 }
 
 void emit_name(emitter_t *emitter, char *instruction, Slice *name)

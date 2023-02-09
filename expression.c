@@ -8,7 +8,8 @@
 #include "statement.h"
 #include "emitter.h"
 
-void compile_expression(emitter_t* emitter, expression* e) {
+void compile_expression(emitter_t *emitter, expression *e)
+{
     switch (e->type)
     {
     case t_not:
@@ -149,6 +150,8 @@ void compile_expression(emitter_t* emitter, expression* e) {
         pop_register(emitter, "rax");
         emit(emitter, "mov %rax, %rsi");
         emit(emitter, "mov $0, %rax");
+
+        align_stack(emitter);
         emit(emitter, "lea format(%rip),%rdi");
         emit(emitter, ".extern printf");
         emit(emitter, "call printf");
@@ -161,40 +164,40 @@ void compile_expression(emitter_t* emitter, expression* e) {
 
 /**
  * Recursively frees up expression memory
-*/
+ */
 void free_expression(expression *e)
 {
-    switch(e->type)
+    switch (e->type)
     {
-        case t_not:
-            free_expression(e->left);
-            break;
-        case t_print:
-            free_expression(e->left);
-            free(e->character);
-            break;
-        case t_num:
-            free(e->character);
-            break;
-        case t_var:
-            free(e->character->name);
-            free(e->character);
-            break;
-        case t_func:
-            free_function(e->character->function);
-            free(e->character);
-            break;
-        default:
-            free_expression(e->left);
-            free_expression(e->right);
-            break;
+    case t_not:
+        free_expression(e->left);
+        break;
+    case t_print:
+        free_expression(e->left);
+        free(e->character);
+        break;
+    case t_num:
+        free(e->character);
+        break;
+    case t_var:
+        free(e->character->name);
+        free(e->character);
+        break;
+    case t_func:
+        free_function(e->character->function);
+        free(e->character);
+        break;
+    default:
+        free_expression(e->left);
+        free_expression(e->right);
+        break;
     }
     free(e);
 }
 
 /**
  * Recursively evaluates an expression
-*/
+ */
 uint64_t eval_expr(Interpreter *in, struct map *map, expression *e)
 {
     switch (e->type)
@@ -242,7 +245,7 @@ uint64_t eval_expr(Interpreter *in, struct map *map, expression *e)
     case t_func:
         return evaluate_function(in, map, e->character->function, get_function(in, e->character->function->name));
     case t_print:
-        printf("%"PRIu64"\n", eval_expr(in, map, e->left));
+        printf("%" PRIu64 "\n", eval_expr(in, map, e->left));
         return 0;
     default:
         return 0;

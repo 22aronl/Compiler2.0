@@ -43,12 +43,14 @@ void declare_function(emitter_t *emitter, struct declare *declare)
     struct map *new_map = create_map();
     struct map *old_map = emitter->var_map;
     uint16_t old_offset = emitter->var_offset;
+    uint64_t old_rsp = emitter->stack_pointer;
     emitter->var_map = new_map;
     emitter->var_offset = 2;
+    emitter->stack_pointer = 8;
 
     for (uint16_t i = 0; i < declare->args; i++)
     {
-        declare_variable(emitter, &declare->parameters[i], (declare->args - i - 1)*8);
+        declare_variable(emitter, &declare->parameters[i], (declare->args - i - 1) * 8);
     }
 
     for (uint32_t i = 0; i < declare->size_body; i++)
@@ -58,7 +60,8 @@ void declare_function(emitter_t *emitter, struct declare *declare)
 
     emitter->var_offset = old_offset;
     emitter->var_map = old_map;
-    
+    emitter->stack_pointer = old_rsp;
+
     free_map(new_map);
     free(new_map->map);
     free(new_map->visited);
@@ -73,7 +76,7 @@ void call_function(emitter_t *emitter, struct func *func)
     {
         compile_expression(emitter, func->parameters[func->args - i - 1]);
     }
-
+    align_stack(emitter);
     emit_name(emitter, "call %s", func->name);
 
     for (uint16_t i = 0; i < func->args; i++)
@@ -102,6 +105,8 @@ void compile_statement(emitter_t *emitter, statement *s)
         pop_register(emitter, "rax");
         emit(emitter, "mov %rax, %rsi");
         emit(emitter, "mov $0, %rax");
+
+        align_stack(emitter);
         emit(emitter, "lea format(%rip),%rdi");
         emit(emitter, ".extern printf");
         emit(emitter, "call printf");
@@ -122,7 +127,8 @@ void compile_statement(emitter_t *emitter, statement *s)
             for (uint32_t i = 0; i < s->internal->if_statement->size_else; i++)
                 compile_statement(emitter, s->internal->if_statement->else_body[i]);
             emit_number(emitter, "endif%d:", if_number);
-        } else
+        }
+        else
         {
             emit_number(emitter, "else%d:", if_number);
         }
@@ -140,7 +146,7 @@ void compile_statement(emitter_t *emitter, statement *s)
             compile_statement(emitter, s->internal->while_statement->body[i]);
         emit_number(emitter, "jmp while%d", while_number);
         emit_number(emitter, "endwhile%d:", while_number);
-	break;
+        break;
     }
     case s_return:
         compile_expression(emitter, s->internal->return_statement->expr);

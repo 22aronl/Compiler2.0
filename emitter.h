@@ -45,3 +45,5 @@ void emit_string(emitter_t* emitter, char* instruction, char* string);
 size_t emit_if_number(emitter_t* emitter);
 
 size_t emit_while_number(emitter_t* emitter);
+
+void align_stack(emitter_t *emitter);
