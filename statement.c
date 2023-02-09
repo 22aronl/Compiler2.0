@@ -72,7 +72,7 @@ void declare_function(emitter_t *emitter, struct declare *declare)
 
 void call_function(emitter_t *emitter, struct func *func)
 {
-    align_stack_function(emitter, func->parameters);
+    align_stack_function(emitter, func->args);
     for (uint16_t i = 0; i < func->args; i++)
     {
         compile_expression(emitter, func->parameters[func->args - i - 1]);
