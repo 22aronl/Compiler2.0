@@ -10,21 +10,33 @@ void add_rsp(emitter_t * emitter) {
     emitter->stack_pointer -= 8;
 }
 
-void align_stack(emitter_t *emitter)
+bool align_stack(emitter_t *emitter)
 {
     if (emitter->stack_pointer % 16 != 0)
     {
         printf("subq $8, %%rsp\n");
         sub_rsp(emitter);
+        return true;
     }
+    return false;
 }
 
-void align_stack_function(emitter_t *emitter, int16_t offset)
+bool align_stack_function(emitter_t *emitter, int16_t offset)
 {
     if ((emitter->stack_pointer + offset * 8)% 16 != 0)
     {
         printf("subq $8, %%rsp\n");
         sub_rsp(emitter);
+        return true;
+    }
+    return false;
+}
+
+void realign_stack(emitter_t *emitter, bool change) {
+    if (change)
+    {
+        printf("addq $8, %%rsp");
+        add_rsp(emitter);
     }
 }
 

@@ -151,10 +151,12 @@ void compile_expression(emitter_t *emitter, expression *e)
         emit(emitter, "mov %rax, %rsi");
         emit(emitter, "mov $0, %rax");
 
-        align_stack(emitter);
+        bool change = align_stack(emitter);
         emit(emitter, "lea format(%rip),%rdi");
         emit(emitter, ".extern printf");
         emit(emitter, "call printf");
+        emit(emitter, "move $0, %rax");
+        realign_stack(emitter, change);
         break;
     default:
         emit(emitter, "implement later");
