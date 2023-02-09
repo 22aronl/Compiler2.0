@@ -2,44 +2,44 @@
 
 #include "emitter.h"
 
-void push_register(emitter_t* emitter, char* name)
+void push_register(emitter_t *emitter, char *name)
 {
     printf("pushq %%%s\n", name);
 }
 
-void pop_register(emitter_t* emitter,char* name)
+void pop_register(emitter_t *emitter, char *name)
 {
     printf("popq %%%s\n", name);
 }
 
-void emit(emitter_t* emitter, char* instruction)
+void emit(emitter_t *emitter, char *instruction)
 {
     printf("%s\n", instruction);
 }
 
-void emit_number(emitter_t* emitter, char* instruction, uint64_t number)
+void emit_number(emitter_t *emitter, char *instruction, uint64_t number)
 {
     printf(instruction, number);
     printf("\n");
 }
 
-int32_t get_offset(emitter_t* emitter, Slice* var)
+int32_t get_offset(emitter_t *emitter, Slice *var)
 {
     int32_t offset = get_map_offset(emitter->var_map, var);
-    if(offset == 0)
+    if (offset == 0)
     {
-        offset = emitter->var_offset++;
-        declare_variable(emitter, var, -offset * 8);
+        offset = -(emitter->var_offset++)*8;
+        declare_variable(emitter, var, offset);
     }
     return offset;
 }
 
-void push_variable(emitter_t* emitter, Slice* var, char* reg)
+void push_variable(emitter_t *emitter, Slice *var, char *reg)
 {
-    printf("movq %d(%%rbp), %%%s\n", get_offset(emitter, var), reg);
+    printf("movq %%%s, %d(%%rbp)\n", get_offset(emitter, var), reg);
 }
 
-void set_up_assembly(emitter_t* emitter)
+void set_up_assembly(emitter_t *emitter)
 {
     emit(emitter, "    .data");
     emit(emitter, "format: .byte '%', 'l', 'u', 10, 0");
@@ -47,43 +47,42 @@ void set_up_assembly(emitter_t* emitter)
     emit(emitter, "    .global main");
 }
 
-
-void emit_start_function(emitter_t* emitter, Slice* name)
+void emit_start_function(emitter_t *emitter, Slice *name)
 {
     emit_name(emitter, "%.*s:\n", name);
     emit(emitter, "pushq %rbp");
     emit(emitter, "movq %rsp, %rbp");
 }
 
-void emit_end_function(emitter_t* emitter)
+void emit_end_function(emitter_t *emitter)
 {
-   emit(emitter, "movq %rbp %rsp");
-   emit(emitter, "popq %rbp");
+    // emit(emitter, "movq %rbp %rsp");
+    // emit(emitter, "popq %rbp");
     emit(emitter, "retq");
 }
 
-void declare_variable(emitter_t* emitter, Slice* var, int16_t index)
+void declare_variable(emitter_t *emitter, Slice *var, int16_t index)
 {
     add_map_offset(emitter->var_map, var, index);
     emit(emitter, "sub $8, %rsp");
 }
 
-void emit_name(emitter_t* emitter, char* instruction, Slice* name)
+void emit_name(emitter_t *emitter, char *instruction, Slice *name)
 {
     printf(instruction, name->len, name->start);
 }
 
-void emit_string(emitter_t* emitter, char* instruction, char* string)
+void emit_string(emitter_t *emitter, char *instruction, char *string)
 {
     printf(instruction, string);
 }
 
-size_t emit_if_number(emitter_t* emitter)
+size_t emit_if_number(emitter_t *emitter)
 {
     return emitter->if_count++;
 }
 
-size_t emit_while_number(emitter_t* emitter)
+size_t emit_while_number(emitter_t *emitter)
 {
     return emitter->while_count++;
 }
