@@ -36,7 +36,7 @@ int32_t get_offset(emitter_t *emitter, Slice *var)
 
 void push_variable(emitter_t *emitter, Slice *var, char *reg)
 {
-    printf("movq %%%s, %d(%%rbp)\n", get_offset(emitter, var), reg);
+    printf("movq %%%s, %d(%%rbp)\n", reg, get_offset(emitter, var));
 }
 
 void set_up_assembly(emitter_t *emitter)
