@@ -138,7 +138,7 @@ void compile_expression(emitter_t *emitter, expression *e)
         push_register(emitter, "rax");
         break;
     case t_num:
-        emit_number(emitter, "movq $%d, \%rax", e->character->value);
+        emit_number(emitter, "movq $%lu, \%rax", e->character->value);
         push_register(emitter, "rax");
         break;
     case t_var:
