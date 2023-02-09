@@ -752,8 +752,13 @@ int main(int argc, const char *const *const argv)
     Interpreter x = createInterpreter(input);
 
     // run(&x);
-    if (input_len > 0)
+    
         run_compile(&x);
-
+    if (input_len == 0)
+    {
+        puts("main:");
+        puts("movq $0, %rax");
+        puts("retq");
+    }
     return 0;
 }
