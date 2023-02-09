@@ -12,7 +12,7 @@ void add_rsp(emitter_t * emitter) {
 
 void align_stack(emitter_t *emitter)
 {
-    if (emitter->stack_pointer % 16 != 0)
+    if (emitter->stack_pointer % 16 == 0)
     {
         printf("subq $8, %%rsp\n");
     }
