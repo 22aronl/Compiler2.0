@@ -50,7 +50,7 @@ void declare_function(emitter_t *emitter, struct declare *declare)
 
     for (uint16_t i = 0; i < declare->args; i++)
     {
-        declare_variable(emitter, &declare->parameters[i], (declare->args - i - 1) * 8);
+        declare_variable(emitter, &declare->parameters[i], i * 8 + 8);
     }
 
     for (uint32_t i = 0; i < declare->size_body; i++)
