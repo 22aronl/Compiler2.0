@@ -153,7 +153,10 @@ void compile_statement(emitter_t *emitter, statement *s)
     case s_return:
         compile_expression(emitter, s->internal->return_statement->expr);
         pop_register(emitter, "rax");
-        emit_end_function(emitter);
+        emit(emitter, "movq %rbp, %rsp");
+        emit(emitter, "popq %rbp");
+        add_rsp(emitter);
+        emit(emitter, "retq");
         break;
     }
 }
