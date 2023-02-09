@@ -142,7 +142,7 @@ void compile_expression(emitter_t* emitter, expression* e) {
         push_register(emitter, "rax");
         break;
     case t_func:
-        emit(emitter, "PANICCCC implement t_func");
+        call_function(emitter, e->character->function);
         break;
     case t_print:
         compile_expression(emitter, e->left);

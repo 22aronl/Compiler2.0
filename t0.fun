@@ -1,8 +1,14 @@
-fun test(x) {
-    print(x)
-}
 
 fun main() {
-    print(1 + 3)
-    test(1)
+    if(1 == 1) {
+        print(1)
+    }
+    else {
+        print(2)
+    }
+
+    while(i < 3) {
+        print(i)
+        i = i + 1
+    }
 }
