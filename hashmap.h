@@ -11,13 +11,13 @@
 struct map {
     hash_map* map;
     bool* visited;
-    uint32_t size;
+    int32_t size;
     bool main;
 };
 
 
-uint16_t get_map_offset(struct map*, Slice* var);
-void add_map_offset(struct map*, Slice*, uint32_t);
+int32_t get_map_offset(struct map*, Slice* var);
+void add_map_offset(struct map*, Slice*, int32_t);
 
 void addSymbol(Interpreter*, struct map*, Slice*, uint64_t, bool force_local);
 uint64_t getSymbol(Interpreter*, struct map*, Slice *);

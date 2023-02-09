@@ -33,6 +33,7 @@ typedef struct {
     size_t stack_pointer;
     size_t if_count;
     size_t while_count;
+    uint16_t var_offset;
 } emitter_t;
 
 typedef struct

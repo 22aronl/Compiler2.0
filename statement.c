@@ -41,20 +41,29 @@ void declare_function(emitter_t *emitter, struct declare *declare)
     emit_start_function(emitter, declare->name);
 
     struct map *new_map = create_map();
+    struct map *old_map = emitter->var_map;
+    uint16_t old_offset = emitter->var_offset;
     emitter->var_map = new_map;
+    emitter->var_offset = 2;
+
     for (uint16_t i = 0; i < declare->args; i++)
     {
-        declare_variable(emitter, &declare->parameters[i], i);
+        declare_variable(emitter, &declare->parameters[i], (declare->args - i - 1)*8);
     }
 
     for (uint32_t i = 0; i < declare->size_body; i++)
     {
         compile_statement(emitter, declare->body[i]);
     }
+
+    emitter->var_offset = old_offset;
+    emitter->var_map = old_map;
+    
     free_map(new_map);
     free(new_map->map);
     free(new_map->visited);
     free(new_map);
+
     emit_end_function(emitter);
 }
 
@@ -62,12 +71,14 @@ void call_function(emitter_t *emitter, struct func *func)
 {
     for (uint16_t i = 0; i < func->args; i++)
     {
-        compile_expression(emitter, func->parameters[i]);
+        compile_expression(emitter, func->parameters[func->args - i - 1]);
     }
+
     emit_name(emitter, "call %s", func->name);
+
     for (uint16_t i = 0; i < func->args; i++)
     {
-        emit(emitter, "pop %rbx");
+        pop_register(emitter, "rbx");
     }
 }
 

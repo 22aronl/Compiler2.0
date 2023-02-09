@@ -7,7 +7,7 @@
 #include "main.h"
 #include "statement.h"
 
-uint16_t get_map_offset(struct map* map, Slice* key) {
+int32_t get_map_offset(struct map* map, Slice* key) {
     bool* visited = map->visited;
     hash_map* symbol_table = map->map;
     uint32_t size = map->size;
@@ -19,14 +19,14 @@ uint16_t get_map_offset(struct map* map, Slice* key) {
         {
             if (slice_eq2(table->bins[i].key, key))
             {
-                return 1;
+                return table->bins[i].value;
             }
         }
     }
     return 0;
 }
 
-void add_map_offset(struct map* map, Slice* key, uint32_t value) {
+void add_map_offset(struct map* map, Slice* key, int32_t value) {
 
     bool *visited = map->visited;
     hash_map *symbol_table = map->map;

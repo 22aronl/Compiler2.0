@@ -23,7 +23,7 @@ void emit(emitter_t*, char* instruction);
 /**
  * returns the offset of the variable compared to the base pointer
 */
-int16_t get_offset(emitter_t*, Slice* var);
+int32_t get_offset(emitter_t*, Slice* var);
 
 void emit_number(emitter_t* emitter, char* instruction, uint64_t number);
 

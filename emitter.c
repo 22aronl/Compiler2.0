@@ -23,9 +23,15 @@ void emit_number(emitter_t* emitter, char* instruction, uint64_t number)
     printf("\n");
 }
 
-int16_t get_offset(emitter_t* emitter, Slice* var)
+int32_t get_offset(emitter_t* emitter, Slice* var)
 {
-    return get_map_offset(emitter->var_map, var);
+    int32_t offset = get_map_offset(emitter->var_map, var);
+    if(offset == 0)
+    {
+        offset = emitter->var_offset++;
+        declare_variable(emitter, var, -offset * 8);
+    }
+    return offset;
 }
 
 void push_variable(emitter_t* emitter, Slice* var, char* reg)
@@ -51,14 +57,14 @@ void emit_start_function(emitter_t* emitter, Slice* name)
 
 void emit_end_function(emitter_t* emitter)
 {
-   // emit(emitter, "movq %rbp %rsp");
-   // emit(emitter, "popq %rbp");
+   emit(emitter, "movq %rbp %rsp");
+   emit(emitter, "popq %rbp");
     emit(emitter, "retq");
 }
 
 void declare_variable(emitter_t* emitter, Slice* var, int16_t index)
 {
-    add_map_offset(emitter->var_map, var, index * 8);
+    add_map_offset(emitter->var_map, var, index);
     emit(emitter, "sub $8, %rsp");
 }
 
