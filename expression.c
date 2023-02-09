@@ -144,6 +144,7 @@ void compile_expression(emitter_t *emitter, expression *e)
         break;
     case t_func:
         call_function(emitter, e->character->function);
+        push_register(emitter, "rax");
         break;
     case t_print:
         compile_expression(emitter, e->left);
