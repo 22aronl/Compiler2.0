@@ -56,6 +56,19 @@ void declare_function(emitter_t *emitter, struct declare *declare)
     emit_end_function(emitter);
 }
 
+void call_function(emitter_t *emitter, struct func *func)
+{
+    for (uint16_t i = func->args - 1; i >= 0; i--)
+    {
+        compile_expression(emitter, func->parameters[i]);
+    }
+    emit_name(emitter, "call %s", func->name);
+    for (uint16_t i = 0; i < func->args; i++)
+    {
+        emit(emitter, "pop %rbx");
+    }
+}
+
 void compile_statement(emitter_t *emitter, statement *s)
 {
     switch (s->type)
@@ -64,7 +77,7 @@ void compile_statement(emitter_t *emitter, statement *s)
         declare_function(emitter, s->internal->declare);
         break;
     case s_func:
-        // PANICCCCCC
+        call_function(emitter, s->internal->func);
         break;
     case s_var:
         compile_expression(emitter, s->internal->var->expr);

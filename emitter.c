@@ -41,22 +41,18 @@ void set_up_assembly(emitter_t* emitter)
     emit(emitter, "    .global main");
 }
 
-void emit_name(emitter_t* emitter, Slice* name)
-{
-    printf("%.*s:\n", (int)name->len, name->start);
-}
 
 void emit_start_function(emitter_t* emitter, Slice* name)
 {
-    emit_name(emitter, name);
+    emit_name(emitter, "%.*s:\n", name);
     emit(emitter, "pushq %rbp");
     emit(emitter, "movq %rsp, %rbp");
 }
 
 void emit_end_function(emitter_t* emitter)
 {
-    // emit(emitter, "movq %rbp %rsp");
-    // emit(emitter, "popq %rbp");
+    emit(emitter, "movq %rbp %rsp");
+    emit(emitter, "popq %rbp");
     emit(emitter, "retq");
 }
 
@@ -64,4 +60,9 @@ void declare_variable(emitter_t* emitter, Slice* var, int16_t index)
 {
     add_map_offset(emitter->var_map, var, index * 8);
     emit(emitter, "sub $8, %rsp");
+}
+
+void emit_name(emitter_t* emitter, char* instruction, Slice* name)
+{
+    printf(instruction, name->len, name->start);
 }

@@ -38,3 +38,4 @@ void declare_variable(emitter_t* emitter, Slice* var, int16_t index);
 
 void set_up_assembly(emitter_t* emitter);
 
+void emit_name(emitter_t* emitter, char* instruction, Slice* name);
