@@ -19,6 +19,15 @@ void align_stack(emitter_t *emitter)
     }
 }
 
+void align_stack_function(emitter_t *emitter, int16_t offset)
+{
+    if ((emitter->stack_pointer + offset * 8)% 16 != 0)
+    {
+        printf("subq $8, %%rsp\n");
+        sub_rsp(emitter);
+    }
+}
+
 void push_register(emitter_t *emitter, char *name)
 {
     printf("pushq %%%s\n", name);
