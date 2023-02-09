@@ -2,11 +2,13 @@
 
 #include "emitter.h"
 
-void sub_rsp(emitter_t * emitter) {
+void sub_rsp(emitter_t *emitter)
+{
     emitter->stack_pointer += 8;
 }
 
-void add_rsp(emitter_t * emitter) {
+void add_rsp(emitter_t *emitter)
+{
     emitter->stack_pointer -= 8;
 }
 
@@ -23,7 +25,7 @@ bool align_stack(emitter_t *emitter)
 
 bool align_stack_function(emitter_t *emitter, int16_t offset)
 {
-    if ((emitter->stack_pointer + offset * 8)% 16 != 0)
+    if ((emitter->stack_pointer + offset * 8) % 16 != 0)
     {
         printf("subq $8, %%rsp\n");
         sub_rsp(emitter);
@@ -32,7 +34,8 @@ bool align_stack_function(emitter_t *emitter, int16_t offset)
     return false;
 }
 
-void realign_stack(emitter_t *emitter, bool change) {
+void realign_stack(emitter_t *emitter, bool change)
+{
     if (change)
     {
         printf("addq $8, %%rsp\n");
@@ -68,8 +71,10 @@ int32_t get_offset(emitter_t *emitter, Slice *var)
     int32_t offset = get_map_offset(emitter->var_map, var);
     if (offset == 0)
     {
-        offset = -(emitter->var_offset++)*8;
+        offset = -(emitter->var_offset++) * 8;
         declare_variable(emitter, var, offset);
+        emit(emitter, "sub $8, %rsp");
+        sub_rsp(emitter);
     }
     return offset;
 }
@@ -106,8 +111,6 @@ void emit_end_function(emitter_t *emitter)
 void declare_variable(emitter_t *emitter, Slice *var, int16_t index)
 {
     add_map_offset(emitter->var_map, var, index);
-    emit(emitter, "sub $8, %rsp");
-    sub_rsp(emitter);
 }
 
 void emit_name(emitter_t *emitter, char *instruction, Slice *name)
