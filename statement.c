@@ -128,7 +128,8 @@ void compile_statement(emitter_t *emitter, statement *s)
         for (uint32_t i = 0; i < s->internal->while_statement->size_body; i++)
             compile_statement(emitter, s->internal->while_statement->body[i]);
         emit_number(emitter, "jmp while%d", while_number);
-        break;
+        emit_number(emitter, "endwhile%d:", while_number);
+	break;
     }
     case s_return:
         compile_expression(emitter, s->internal->return_statement->expr);
