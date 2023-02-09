@@ -29,16 +29,16 @@ void compile_expression(emitter_t *emitter, expression *e)
     case t_divide:
         compile_expression(emitter, e->left);
         compile_expression(emitter, e->right);
-        pop_register(emitter, "rax");
         pop_register(emitter, "rbx");
+        pop_register(emitter, "rax");
         emit(emitter, "idiv \%rbx");
         push_register(emitter, "rbx");
         break;
     case t_mod:
         compile_expression(emitter, e->left);
         compile_expression(emitter, e->right);
-        pop_register(emitter, "rax");
         pop_register(emitter, "rbx");
+        pop_register(emitter, "rax");
         emit(emitter, "idiv \%rbx");
         push_register(emitter, "rax");
         break;
@@ -53,8 +53,8 @@ void compile_expression(emitter_t *emitter, expression *e)
     case t_minus:
         compile_expression(emitter, e->left);
         compile_expression(emitter, e->right);
-        pop_register(emitter, "rax");
         pop_register(emitter, "rbx");
+        pop_register(emitter, "rax");
         emit(emitter, "sub \%rbx, \%rax");
         push_register(emitter, "rax");
         break;
@@ -158,6 +158,7 @@ void compile_expression(emitter_t *emitter, expression *e)
         emit(emitter, "call printf");
         emit(emitter, "mov $0, %rax");
         realign_stack(emitter, change);
+        push_register(emitter, "rax");
         break;
     default:
         emit(emitter, "implement later");
