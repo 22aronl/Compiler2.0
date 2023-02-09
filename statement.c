@@ -44,7 +44,7 @@ void declare_function(emitter_t *emitter, struct declare *declare)
     uint16_t old_offset = emitter->var_offset;
     uint64_t old_rsp = emitter->stack_pointer;
     emitter->var_map = new_map;
-    emitter->var_offset = 2;
+    emitter->var_offset = 1;
     emitter->stack_pointer = 8;
     emit_start_function(emitter, declare->name);
 
