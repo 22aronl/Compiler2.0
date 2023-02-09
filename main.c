@@ -22,13 +22,13 @@ statement *parse_statement(Interpreter *in, bool *effects);
 /**
  * creates an interpreter
 */
-Interpreter createInterpreter(char const *const program)
+Interpreter createInterpreter(char* program)
 {
     bool *visited = malloc(MAX_SYMBOLS * sizeof(bool));
     memset(visited, 0, MAX_SYMBOLS * sizeof(bool));
     bool *visited_func = malloc(MAX_SYMBOLS * sizeof(bool));
     memset(visited_func, 0, MAX_SYMBOLS * sizeof(bool));
-    Interpreter in = {program, program, visited, visited_func};
+    Interpreter in = {program, visited, visited_func};
     in.symbol_table = malloc(MAX_SYMBOLS * sizeof(struct symbol_table));
     in.function_table = malloc(MAX_SYMBOLS * sizeof(struct function_table));
     in.size_ast = 100;
@@ -703,47 +703,37 @@ void run(Interpreter *in)
 
 int main(int argc, const char *const *const argv)
 {
-    // fprintf(stdout, "hiii %d", argc);
-    // fprintf(stdout, "s%s", argv[0]);
-    // printf("HI %d", argc);
-    if (argc != 2)
-    {
-        fprintf(stderr, "usage: %s <file name>\n", argv[0]);
-        exit(1);
-    }
 
-    // open the file
-    int fd = open(argv[1], O_RDONLY);
-    if (fd < 0)
-    {
-        perror("open");
-        exit(1);
-    }
+    // // map the file in my address space
+    // char const *prog = (char const *)mmap(
+    //     0,
+    //     file_stats.st_size,
+    //     PROT_READ,
+    //     MAP_PRIVATE,
+    //     fd,
+    //     0);
+    // if (prog == MAP_FAILED)
+    // {
+    //     perror("mmap");
+    //     exit(1);
+    // }
 
-    // determine its size (std::filesystem::get_size?)
-    struct stat file_stats;
-    int rc = fstat(fd, &file_stats);
-    if (rc != 0)
-    {
-        perror("fstat");
-        exit(1);
-    }
+    char* input = malloc(sizeof(char)*2);
+    size_t input_size = 0;
+    size_t input_len = 2;
 
-    // map the file in my address space
-    char const *prog = (char const *)mmap(
-        0,
-        file_stats.st_size,
-        PROT_READ,
-        MAP_PRIVATE,
-        fd,
-        0);
-    if (prog == MAP_FAILED)
-    {
-        perror("mmap");
-        exit(1);
-    }
+    int ch;
 
-    Interpreter x = createInterpreter(prog);
+    while ((ch = getchar()) != EOF) {
+        if (input_len == input_size) {
+            input_size = input_size * 2;
+            input = realloc(input, input_size);
+        }
+        input[input_len++] = ch;
+    }
+    input[input_len] = '\0';
+
+    Interpreter x = createInterpreter(input);
 
     // run(&x);
     run_compile(&x);

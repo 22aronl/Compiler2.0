@@ -73,6 +73,7 @@ void compile_statement(emitter_t *emitter, statement *s)
         break;
     case s_print:
         compile_expression(emitter, s->internal->print->expr);
+        pop_register(emitter, "rax");
         emit(emitter, "mov %rax, %rsi");
         emit(emitter, "mov $0, %rax");
         emit(emitter, "lea format(%rip),%rdi");

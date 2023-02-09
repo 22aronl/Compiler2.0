@@ -34,8 +34,7 @@ typedef struct {
 
 typedef struct
 {
-    char const *const program;
-    char const *current;
+    char *current;
     bool *visited;
     bool *visited_func;
     hash_map* symbol_table;
