@@ -156,7 +156,7 @@ void compile_expression(emitter_t *emitter, expression *e)
         emit(emitter, "lea format(%rip),%rdi");
         emit(emitter, ".extern printf");
         emit(emitter, "call printf");
-        emit(emitter, "move $0, %rax");
+        emit(emitter, "mov $0, %rax");
         realign_stack(emitter, change);
         break;
     default:
