@@ -54,7 +54,7 @@ void skip(Interpreter *in)
 */
 void fail(Interpreter *in)
 {
-    printf("failed at offset %ld\n", (size_t)(in->current - in->program));
+    printf("failed at offset %ld\n", (size_t)(in->current));
     printf("%s\n", in->current);
     exit(1);
 }
@@ -657,8 +657,8 @@ void free_interpreter_internal(Interpreter *in)
 void run_compile(Interpreter* in) {
     emitter_t* em = malloc(sizeof(emitter_t));
     bool continue_parsing = true;
-    struct map map = {in->symbol_table, in->visited, MAX_SYMBOLS, true};
-    uint64_t return_value = 0;
+    //struct map map = {in->symbol_table, in->visited, MAX_SYMBOLS, true};
+    //uint64_t return_value = 0;
     set_up_assembly(em);
     while (true)
     {
