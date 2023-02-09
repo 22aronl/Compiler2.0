@@ -40,13 +40,15 @@ void declare_function(emitter_t *emitter, struct declare *declare)
 {
     emit_start_function(emitter, declare->name);
 
-    struct map* new_map = create_map();
+    struct map *new_map = create_map();
     emitter->var_map = new_map;
-    for(uint16_t i = 0; i < declare->args; i++) {
+    for (uint16_t i = 0; i < declare->args; i++)
+    {
         declare_variable(emitter, &declare->parameters[i], i);
     }
 
-    for(uint32_t i = 0; i < declare->size_body; i++) {
+    for (uint32_t i = 0; i < declare->size_body; i++)
+    {
         compile_statement(emitter, declare->body[i]);
     }
     free_map(new_map);
@@ -58,7 +60,7 @@ void declare_function(emitter_t *emitter, struct declare *declare)
 
 void call_function(emitter_t *emitter, struct func *func)
 {
-    for (uint16_t i = func->args - 1; i >= 0; i--)
+    for (uint16_t i = 0; i < func->args; i++)
     {
         compile_expression(emitter, func->parameters[i]);
     }
@@ -94,11 +96,40 @@ void compile_statement(emitter_t *emitter, statement *s)
         emit(emitter, "call printf");
         break;
     case s_if:
-        // PANICCC AGAIN
+    {
+        compile_expression(emitter, s->internal->if_statement->condition);
+        pop_register(emitter, "rax");
+        emit(emitter, "cmp $0, %rax");
+        size_t if_number = emit_if_number(emitter);
+        emit_number(emitter, "je else%d", if_number);
+        for (uint32_t i = 0; i < s->internal->if_statement->size_body; i++)
+            compile_statement(emitter, s->internal->if_statement->body[i]);
+        if (s->internal->if_statement->has_else)
+        {
+            emit_number(emitter, "jmp endif%d", if_number);
+            emit_number(emitter, "else%d:", if_number);
+            for (uint32_t i = 0; i < s->internal->if_statement->size_else; i++)
+                compile_statement(emitter, s->internal->if_statement->else_body[i]);
+            emit_number(emitter, "endif%d:", if_number);
+        } else
+        {
+            emit_number(emitter, "else%d:", if_number);
+        }
         break;
+    }
     case s_while:
-        // PANICCCCAA
+    {
+        size_t while_number = emit_while_number(emitter);
+        emit_number(emitter, "while%d:", while_number);
+        compile_expression(emitter, s->internal->while_statement->condition);
+        pop_register(emitter, "rax");
+        emit(emitter, "cmp $0, %rax");
+        emit_number(emitter, "je endwhile%d", while_number);
+        for (uint32_t i = 0; i < s->internal->while_statement->size_body; i++)
+            compile_statement(emitter, s->internal->while_statement->body[i]);
+        emit_number(emitter, "jmp while%d", while_number);
         break;
+    }
     case s_return:
         compile_expression(emitter, s->internal->return_statement->expr);
         pop_register(emitter, "rax");
@@ -174,7 +205,6 @@ void free_statement(statement *s)
     free(s->internal);
     free(s);
 }
-
 
 /**
  * Recursively evaluates a function by loading all the parameters into a new map and then evaluating the body

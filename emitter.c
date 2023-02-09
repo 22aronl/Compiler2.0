@@ -66,3 +66,18 @@ void emit_name(emitter_t* emitter, char* instruction, Slice* name)
 {
     printf(instruction, name->len, name->start);
 }
+
+void emit_string(emitter_t* emitter, char* instruction, char* string)
+{
+    printf(instruction, string);
+}
+
+size_t emit_if_number(emitter_t* emitter)
+{
+    return emitter->if_count++;
+}
+
+size_t emit_while_number(emitter_t* emitter)
+{
+    return emitter->while_count++;
+}

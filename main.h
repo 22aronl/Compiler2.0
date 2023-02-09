@@ -30,6 +30,9 @@ typedef struct function_table
 
 typedef struct {
     struct map* var_map;
+    size_t stack_pointer;
+    size_t if_count;
+    size_t while_count;
 } emitter_t;
 
 typedef struct

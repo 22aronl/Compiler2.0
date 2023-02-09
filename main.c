@@ -656,6 +656,9 @@ void free_interpreter_internal(Interpreter *in)
 
 void run_compile(Interpreter* in) {
     emitter_t* em = malloc(sizeof(emitter_t));
+    em->if_count = 0;
+    em->while_count = 0;
+    em->stack_pointer = 0;
     bool continue_parsing = true;
     //struct map map = {in->symbol_table, in->visited, MAX_SYMBOLS, true};
     //uint64_t return_value = 0;
