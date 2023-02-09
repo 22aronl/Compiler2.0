@@ -77,7 +77,7 @@ void call_function(emitter_t *emitter, struct func *func)
         compile_expression(emitter, func->parameters[func->args - i - 1]);
     }
     align_stack(emitter);
-    emit_name(emitter, "call %.*s", func->name);
+    emit_name(emitter, "call %.*s\n", func->name);
 
     for (uint16_t i = 0; i < func->args; i++)
     {
