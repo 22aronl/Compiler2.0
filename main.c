@@ -21,8 +21,8 @@ statement *parse_statement(Interpreter *in, bool *effects);
 
 /**
  * creates an interpreter
-*/
-Interpreter createInterpreter(char* program)
+ */
+Interpreter createInterpreter(char *program)
 {
     bool *visited = malloc(MAX_SYMBOLS * sizeof(bool));
     memset(visited, 0, MAX_SYMBOLS * sizeof(bool));
@@ -40,7 +40,7 @@ Interpreter createInterpreter(char* program)
 
 /**
  * skips over all white lines
-*/
+ */
 void skip(Interpreter *in)
 {
     while (isspace(*in->current))
@@ -51,7 +51,7 @@ void skip(Interpreter *in)
 
 /**
  * fails the program
-*/
+ */
 void fail(Interpreter *in)
 {
     printf("failed at offset %ld\n", (size_t)(in->current));
@@ -61,7 +61,7 @@ void fail(Interpreter *in)
 
 /**
  * ends the program if the current character is not a space
-*/
+ */
 void end_or_fail(Interpreter *in)
 {
     while (isspace(*in->current))
@@ -74,7 +74,7 @@ void end_or_fail(Interpreter *in)
 
 /**
  * checks if the current character is a given character defined by str
-*/
+ */
 bool consume(Interpreter *in, const char *str)
 {
     skip(in);
@@ -101,7 +101,7 @@ bool consume(Interpreter *in, const char *str)
 
 /**
  * This eats the string if it is a valid identifier, however, it checks up until there is a space or non-alphanumeric character
-*/
+ */
 bool eat(Interpreter *in, const char *str)
 {
     skip(in);
@@ -129,7 +129,7 @@ bool eat(Interpreter *in, const char *str)
 
 /**
  * This fails if the string is not a valid identifier
-*/
+ */
 void consume_or_fail(Interpreter *in, const char *str)
 {
     if (!consume(in, str))
@@ -140,7 +140,7 @@ void consume_or_fail(Interpreter *in, const char *str)
 
 /**
  * Consumes a single token
-*/
+ */
 Slice *consume_token(Interpreter *in)
 {
     skip(in);
@@ -170,7 +170,7 @@ uint64_t consume_literal(Interpreter *in)
 
 /**
  * creates an expression with a left and right expression and a type
-*/
+ */
 expression *create_expression(expression *left, expression *right, enum type_of type)
 {
     expression *expr = malloc(sizeof(expression));
@@ -182,7 +182,7 @@ expression *create_expression(expression *left, expression *right, enum type_of 
 
 /**
  * Parses all the arguments of a function and then returns that array
-*/
+ */
 Slice *parse_args(Interpreter *in, Slice *args, uint16_t *num_args)
 {
     uint16_t args_size = 0;
@@ -211,7 +211,7 @@ Slice *parse_args(Interpreter *in, Slice *args, uint16_t *num_args)
 
 /**
  * parses all the expressions of a function and then returns that array
-*/
+ */
 expression **parse_args2(Interpreter *in, expression **args, uint16_t *num_args)
 {
     uint16_t args_size = 0;
@@ -238,7 +238,7 @@ expression **parse_args2(Interpreter *in, expression **args, uint16_t *num_args)
 
 /**
  * Parses the value at the end of the expression tree
-*/
+ */
 expression *parse_value(Interpreter *in)
 {
     if (consume(in, "("))
@@ -261,14 +261,14 @@ expression *parse_value(Interpreter *in)
         Slice *sl = consume_token(in);
         if (consume(in, "("))
         {
-            if (slice_eq(sl, "print")) //checks if method is a print statement
+            if (slice_eq(sl, "print")) // checks if method is a print statement
             {
                 free(sl);
                 expr->type = t_print;
                 expr->left = parse_expression(in);
                 consume_or_fail(in, ")");
             }
-            else //otherwise its a normal function
+            else // otherwise its a normal function
             {
                 struct func *func = malloc(sizeof(struct func));
 
@@ -475,7 +475,7 @@ statement *parse_statement(Interpreter *in, bool *continue_parsing)
 
     if (eat(in, "if"))
     {
-        consume_or_fail(in, "("); //if the statement is an if statement
+        consume_or_fail(in, "("); // if the statement is an if statement
         expression *condition = parse_expression(in);
         consume_or_fail(in, ")");
         consume_or_fail(in, "{");
@@ -488,7 +488,7 @@ statement *parse_statement(Interpreter *in, bool *continue_parsing)
         if_statement->body = body;
         if_statement->size_body = body_size;
 
-        if (eat(in, "else")) //if the statement has an else
+        if (eat(in, "else")) // if the statement has an else
         {
             consume_or_fail(in, "{");
             statement **else_body = malloc(sizeof(statement *));
@@ -509,7 +509,7 @@ statement *parse_statement(Interpreter *in, bool *continue_parsing)
     }
     else if (eat(in, "while"))
     {
-        consume_or_fail(in, "("); //if the statement is a while statement
+        consume_or_fail(in, "("); // if the statement is a while statement
         expression *condition = parse_expression(in);
         consume_or_fail(in, ")");
         consume_or_fail(in, "{");
@@ -558,9 +558,9 @@ statement *parse_statement(Interpreter *in, bool *continue_parsing)
     else if (isalpha(*in->current))
     {
         Slice *name = consume_token(in);
-        if (consume(in, "(")) //the statement is a function
+        if (consume(in, "(")) // the statement is a function
         {
-            if (slice_eq(name, "print")) //checks to see if the function is print
+            if (slice_eq(name, "print")) // checks to see if the function is print
             {
                 free(name);
                 expression *expr = parse_expression(in);
@@ -588,7 +588,7 @@ statement *parse_statement(Interpreter *in, bool *continue_parsing)
         }
         else
         {
-            consume_or_fail(in, "="); //statement is assignemtn
+            consume_or_fail(in, "="); // statement is assignemtn
             expression *expr = parse_expression(in);
             struct var *var = malloc(sizeof(struct var));
             var->name = name;
@@ -610,7 +610,7 @@ statement *parse_statement(Interpreter *in, bool *continue_parsing)
 
 /**
  * adds statement to a statement array
-*/
+ */
 void add_statement(Interpreter *in, statement *state)
 {
     if (in->cur_ast == in->size_ast)
@@ -623,7 +623,7 @@ void add_statement(Interpreter *in, statement *state)
 
 /**
  * cleans up all the statements in the ast
-*/
+ */
 void clear_ast(Interpreter *in)
 {
     for (uint32_t i = 0; i < in->cur_ast; i++)
@@ -635,7 +635,7 @@ void clear_ast(Interpreter *in)
 
 /**
  * frees the internal statements in an interpereter
-*/
+ */
 void free_interpreter_internal(Interpreter *in)
 {
     for (uint32_t i = 0; i < MAX_SYMBOLS; i++)
@@ -654,16 +654,17 @@ void free_interpreter_internal(Interpreter *in)
     free(in->function_table);
 }
 
-void run_compile(Interpreter* in) {
-    emitter_t* em = malloc(sizeof(emitter_t));
+void run_compile(Interpreter *in)
+{
+    emitter_t *em = malloc(sizeof(emitter_t));
     em->if_count = 0;
     em->while_count = 0;
     em->stack_pointer = 0;
     bool continue_parsing = true;
-    //struct map map = {in->symbol_table, in->visited, MAX_SYMBOLS, true};
-    //uint64_t return_value = 0;
+    // struct map map = {in->symbol_table, in->visited, MAX_SYMBOLS, true};
+    // uint64_t return_value = 0;
     set_up_assembly(em);
-    
+
     while (true)
     {
         statement *state = parse_statement(in, &continue_parsing);
@@ -680,7 +681,6 @@ void run_compile(Interpreter* in) {
     clear_ast(in);
     free_interpreter_internal(in);
     end_or_fail(in);
-
 }
 
 void run(Interpreter *in)
@@ -722,14 +722,26 @@ int main(int argc, const char *const *const argv)
     //     exit(1);
     // }
 
-    char* input = malloc(sizeof(char)*2);
+    char *input = malloc(sizeof(char) * 2);
     size_t input_size = 2;
     size_t input_len = 0;
 
     int ch;
 
-    while ((ch = getchar()) != EOF) {
-        if (input_len == input_size) {
+    while ((ch = getchar()) != EOF)
+    {
+        if (ch == '#')
+        {
+            while ((ch = getchar()) != '\n')
+            {
+                if (ch == EOF)
+                {
+                    break;
+                }
+            }
+        }
+        if (input_len == input_size)
+        {
             input_size = input_size * 2;
             input = realloc(input, input_size);
         }
@@ -737,11 +749,11 @@ int main(int argc, const char *const *const argv)
     }
     input[input_len] = '\0';
 
-
     Interpreter x = createInterpreter(input);
 
     // run(&x);
-    run_compile(&x);
+    if (input_len > 0)
+        run_compile(&x);
 
     return 0;
 }
