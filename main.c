@@ -752,8 +752,8 @@ int main(int argc, const char *const *const argv)
     Interpreter x = createInterpreter(input);
 
     // run(&x);
-    
-        run_compile(&x);
+
+    run_compile(&x);
     if (input_len == 0)
     {
         puts("main:");
