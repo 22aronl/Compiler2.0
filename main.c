@@ -660,6 +660,7 @@ void run_compile(Interpreter* in) {
     //struct map map = {in->symbol_table, in->visited, MAX_SYMBOLS, true};
     //uint64_t return_value = 0;
     set_up_assembly(em);
+    
     while (true)
     {
         statement *state = parse_statement(in, &continue_parsing);
@@ -719,8 +720,8 @@ int main(int argc, const char *const *const argv)
     // }
 
     char* input = malloc(sizeof(char)*2);
-    size_t input_size = 0;
-    size_t input_len = 2;
+    size_t input_size = 2;
+    size_t input_len = 0;
 
     int ch;
 
@@ -732,6 +733,7 @@ int main(int argc, const char *const *const argv)
         input[input_len++] = ch;
     }
     input[input_len] = '\0';
+
 
     Interpreter x = createInterpreter(input);
 
