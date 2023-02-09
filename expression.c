@@ -15,7 +15,7 @@ void compile_expression(emitter_t *emitter, expression *e)
     case t_not:
         compile_expression(emitter, e->left);
         pop_register(emitter, "rax");
-        emit(emitter, "cmp $0, %rbx");
+        emit(emitter, "movq $0, %rbx");
         emit(emitter, "cmp \%rbx, \%rax");
         emit(emitter, "sete \%al");
         emit(emitter, "movzbq \%al, \%rax");
