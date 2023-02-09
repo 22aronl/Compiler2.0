@@ -34,16 +34,18 @@ void compile_expression(emitter_t *emitter, expression *e)
         compile_expression(emitter, e->right);
         pop_register(emitter, "rbx");
         pop_register(emitter, "rax");
+        emit(emitter, "movq $0, %rdx");
         emit(emitter, "idiv \%rbx");
-        push_register(emitter, "rbx");
+        push_register(emitter, "rax");
         break;
     case t_mod:
         compile_expression(emitter, e->left);
         compile_expression(emitter, e->right);
         pop_register(emitter, "rbx");
         pop_register(emitter, "rax");
+        emit(emitter, "movq $0, %rdx");
         emit(emitter, "idiv \%rbx");
-        push_register(emitter, "rax");
+        push_register(emitter, "rdx");
         break;
     case t_plus:
         compile_expression(emitter, e->left);
