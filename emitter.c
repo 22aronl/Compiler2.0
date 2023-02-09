@@ -75,8 +75,9 @@ void emit_start_function(emitter_t *emitter, Slice *name)
 
 void emit_end_function(emitter_t *emitter)
 {
-    emit(emitter, "movq %rbp %rsp");
-    // emit(emitter, "popq %rbp");
+    emit(emitter, "movq %rbp, %rsp");
+    emit(emitter, "popq %rbp");
+    add_rsp(emitter);
     emit(emitter, "retq");
 }
 
