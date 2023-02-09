@@ -1,5 +1,5 @@
 PROG = p3
-CFLAGS = -Werror -Wall -O3 -g -std=c11
+CFLAGS = -Werror -Wall -O0 -g -std=c11
 
 C_FILES=${wildcard *.c}
 O_FILES=${subst .c,.o,${C_FILES}}
@@ -26,7 +26,7 @@ ${TEST_S} : %.s : Makefile ${PROG} %.fun
 	./p3 < $*.fun > $*.s
 
 ${TEST_RUNS} : %.run : Makefile %.s
-	gcc -o $*.run -static $*.s
+	gcc -g -o $*.run -static $*.s
 
 ${TEST_OUTS} : %.out : Makefile %.run
 	@echo "failed to run" > $*.out
