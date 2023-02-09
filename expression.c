@@ -61,8 +61,8 @@ void compile_expression(emitter_t *emitter, expression *e)
     case t_l:
         compile_expression(emitter, e->left);
         compile_expression(emitter, e->right);
-        pop_register(emitter, "rax");
         pop_register(emitter, "rbx");
+        pop_register(emitter, "rax");
         emit(emitter, "cmp \%rbx, \%rax");
         emit(emitter, "setl \%al");
         emit(emitter, "movzbq \%al, \%rax");
@@ -71,8 +71,8 @@ void compile_expression(emitter_t *emitter, expression *e)
     case t_g:
         compile_expression(emitter, e->left);
         compile_expression(emitter, e->right);
-        pop_register(emitter, "rax");
         pop_register(emitter, "rbx");
+        pop_register(emitter, "rax");
         emit(emitter, "cmp \%rbx, \%rax");
         emit(emitter, "setg \%al");
         emit(emitter, "movzbq \%al, \%rax");
@@ -81,8 +81,8 @@ void compile_expression(emitter_t *emitter, expression *e)
     case t_lt:
         compile_expression(emitter, e->left);
         compile_expression(emitter, e->right);
-        pop_register(emitter, "rax");
         pop_register(emitter, "rbx");
+        pop_register(emitter, "rax");
         emit(emitter, "cmp \%rbx, \%rax");
         emit(emitter, "setle \%al");
         emit(emitter, "movzbq \%al, \%rax");
@@ -91,8 +91,8 @@ void compile_expression(emitter_t *emitter, expression *e)
     case t_gt:
         compile_expression(emitter, e->left);
         compile_expression(emitter, e->right);
-        pop_register(emitter, "rax");
         pop_register(emitter, "rbx");
+        pop_register(emitter, "rax");
         emit(emitter, "cmp \%rbx, \%rax");
         emit(emitter, "setge \%al");
         emit(emitter, "movzbq \%al, \%rax");
@@ -101,8 +101,8 @@ void compile_expression(emitter_t *emitter, expression *e)
     case t_eq:
         compile_expression(emitter, e->left);
         compile_expression(emitter, e->right);
-        pop_register(emitter, "rax");
         pop_register(emitter, "rbx");
+        pop_register(emitter, "rax");
         emit(emitter, "cmp \%rbx, \%rax");
         emit(emitter, "sete \%al");
         emit(emitter, "movzbq \%al, \%rax");
@@ -111,8 +111,8 @@ void compile_expression(emitter_t *emitter, expression *e)
     case t_neq:
         compile_expression(emitter, e->left);
         compile_expression(emitter, e->right);
-        pop_register(emitter, "rax");
         pop_register(emitter, "rbx");
+        pop_register(emitter, "rax");
         emit(emitter, "cmp \%rbx, \%rax");
         emit(emitter, "setne \%al");
         emit(emitter, "movzbq \%al, \%rax");
