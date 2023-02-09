@@ -77,8 +77,8 @@ void call_function(emitter_t *emitter, struct func *func)
     {
         compile_expression(emitter, func->parameters[func->args - i - 1]);
     }
-    emit_name(emitter, "call 1%.*s\n", func->name);
-
+    emit_name(emitter, "call %.*s\n", func->name);
+    
     for (uint16_t i = 0; i < func->args; i++)
     {
         pop_register(emitter, "rbx");

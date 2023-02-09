@@ -89,12 +89,12 @@ void set_up_assembly(emitter_t *emitter)
     emit(emitter, "    .data");
     emit(emitter, "format: .byte '%', 'l', 'u', 10, 0");
     emit(emitter, "    .text");
-    emit(emitter, "    .global 1main");
+    emit(emitter, "    .global main");
 }
 
 void emit_start_function(emitter_t *emitter, Slice *name)
 {
-    emit_name(emitter, "1%.*s:\n", name);
+    emit_name(emitter, "%.*s:\n", name);
     emit(emitter, "pushq %rbp");
     emit(emitter, "movq %rsp, %rbp");
     sub_rsp(emitter);
