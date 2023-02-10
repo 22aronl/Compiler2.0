@@ -755,12 +755,16 @@ int main(int argc, const char *const *const argv)
                 }
             }
         }
-        if (input_len == input_size)
+
+        if (ch != EOF)
         {
-            input_size = input_size * 2;
-            input = realloc(input, input_size);
+            if (input_len == input_size)
+            {
+                input_size = input_size * 2;
+                input = realloc(input, input_size);
+            }
+            input[input_len++] = ch;
         }
-        input[input_len++] = ch;
     }
     input[input_len] = '\0';
 
