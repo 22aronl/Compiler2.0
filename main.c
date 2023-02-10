@@ -270,7 +270,7 @@ expression *parse_value(Interpreter *in)
             }
             else // otherwise its a normal function
             {
-                if(slice_eq(sl, "printf"))
+                if (slice_eq(sl, "printf"))
                 {
                     free(sl);
                     sl = slice_construct("printf2", 7);
@@ -533,6 +533,11 @@ statement *parse_statement(Interpreter *in, bool *continue_parsing)
     else if (eat(in, "fun"))
     {
         Slice *name = consume_token(in);
+        if (slice_eq(name, "printf"))
+        {
+            free(name);
+            name = slice_construct("printf2", 7);
+        }
         consume_or_fail(in, "(");
         Slice *args = malloc(sizeof(Slice));
         uint16_t args_size = 0;
@@ -579,7 +584,7 @@ statement *parse_statement(Interpreter *in, bool *continue_parsing)
             }
             else
             {
-                if(slice_eq(name, "printf"))
+                if (slice_eq(name, "printf"))
                 {
                     free(name);
                     name = slice_construct("printf2", 7);
