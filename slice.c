@@ -2,11 +2,14 @@
 #include <stddef.h>
 #include <stdint.h>
 #include <stdio.h>
+#include <stdlib.h>
 
 #include "slice2.h"
 
-Slice slice_construct(char const *const s, size_t const l) {
-    Slice sl = {s, l};
+Slice* slice_construct(char const *const s, size_t const l) {
+    Slice* sl = malloc(sizeof(Slice));
+    sl->start = s;
+    sl->len = l;
     return sl;
 }
 
