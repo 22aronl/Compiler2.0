@@ -5,6 +5,7 @@
         "iterator": "c",
         "memory": "c",
         "__tree": "c",
-        "map": "c"
+        "map": "c",
+        "emitter.h": "c"
     }
 }
