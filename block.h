@@ -1,6 +1,11 @@
 
 #include "statement.h"
 
+struct queue {
+    uint32_t block_index;
+    bool has_next;
+    struct queue* next;
+};
 
 struct var_bin {
     int32_t* vars;
@@ -26,6 +31,11 @@ typedef struct {
     struct var_bin** variables;
     uint32_t variables_index;
     uint32_t variables_size;
+    bool loop;
+    uint32_t out_blocks_size_dag;
+    bool* in_blocks_dag;
+    bool* out_blocks_dag;
+    bool* defined_in_block;
 } block_t;
 
 typedef struct {
@@ -39,3 +49,4 @@ typedef struct {
 method_t* parse_method(struct declare * declare);
 struct map* create_small_map();
 void create_next_use_information(block_t *block);
+void live_variable_analysis(method_t *method);
