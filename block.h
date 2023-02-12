@@ -38,3 +38,4 @@ typedef struct {
 
 method_t* parse_method(struct declare * declare);
 struct map* create_small_map();
+void create_next_use_information(block_t *block);

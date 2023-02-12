@@ -166,6 +166,7 @@ method_t *parse_method(struct declare *declare)
         for(uint32_t j = 0; j < blocks[i]->out_blocks_index; j++) {
             add_to_in(blocks[blocks[i]->out_blocks[j]], i);
         }
+        create_next_use_information(blocks[i]);
     }
 
     method->blocks = blocks;
