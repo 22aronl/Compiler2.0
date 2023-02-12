@@ -79,6 +79,8 @@ struct statement
 {
     union internal *internal;
     enum type_of_s type;
+    // int32_t* variables;
+    // uint16_t variables_size;
 };
 
 void compile_statement(emitter_t*, statement*);
