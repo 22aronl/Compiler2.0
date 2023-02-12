@@ -160,11 +160,17 @@ method_t *parse_method(struct declare *declare)
 
     parse_block(declare->body, declare->size_body, blocks, &block_index, &block_size, exit_block);
 
+    for(uint32_t i = 0; i < block_index; i++) {
+        for(uint32_t j = 0; j < blocks[i]->out_blocks_index; j++) {
+            add_to_in(blocks[blocks[i]->out_blocks[j]], i);
+        }
+    }
+
     method->blocks = blocks;
     method->block_size = block_index;
     method->name = declare->name;
     method->parameters = declare->parameters;
     method->args = declare->args;
-    
+
     return method;
 }
