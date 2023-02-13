@@ -150,9 +150,8 @@ void parse_block(statement **body, uint32_t size_body, block_t **block_array, ui
         }
     }
 
-    if(cur_statement_index > 0)
+    if (cur_statement_index > 0)
         add_new_block(blocks, block_index, block_size, cur_statements, &cur_statement_index, &cur_statement_size);
-
 }
 
 method_t *parse_method(struct declare *declare)
@@ -324,21 +323,21 @@ void create_next_use_information(block_t *block, struct map *map)
         next_use_statement(s, block, i - 1);
     }
 
-    if(block->variables_index == 0)
-        block->variables_index++;
-
-    block->defined_in_block = malloc(sizeof(bool) * block->variables_index);
-    for(uint32_t i = 0; i < block->variables_index; i++)
-        block->defined_in_block[i] = false;
-
-    for (uint32_t j = 0; j < block->variables_index; j++)
+    if (block->variables_index == 0)
     {
-        for (uint32_t k = 0; k < block->variables[j]->index; k++)
+        block->defined_in_block = malloc(sizeof(bool) * block->variables_index);
+        for (uint32_t i = 0; i < block->variables_index; i++)
+            block->defined_in_block[i] = false;
+
+        for (uint32_t j = 0; j < block->variables_index; j++)
         {
-            if (block->variables[j]->vars[k] < 0)
+            for (uint32_t k = 0; k < block->variables[j]->index; k++)
             {
-                block->defined_in_block[j] = true;
-                break;
+                if (block->variables[j]->vars[k] < 0)
+                {
+                    block->defined_in_block[j] = true;
+                    break;
+                }
             }
         }
     }
