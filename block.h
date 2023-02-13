@@ -62,3 +62,6 @@ method_t* parse_method(struct declare * declare);
 struct map* create_small_map();
 void create_next_use_information(block_t *block, struct map* map);
 void live_variable_analysis(method_t *method);
+uint16_t generate_expression(emitter_t *emitter, expression *expr, uint32_t statement_index, block_t *block, registers_t *reg);
+
+void compile_method(emitter_t *emitter, struct declare *declare);

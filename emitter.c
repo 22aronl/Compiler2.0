@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <stdlib.h>
 
 #include "emitter.h"
 
@@ -66,6 +67,18 @@ void emit_number(emitter_t *emitter, char *instruction, uint64_t number)
     printf("\n");
 }
 
+void emit_number_to_reg(emitter_t *emitter, char *instruction, uint64_t number, char *reg)
+{
+    printf(instruction, number, reg);
+    printf("\n");
+}
+
+void emit_reg_to_reg(emitter_t *emitter, char *instruction, char *reg1, char *reg2)
+{
+    printf(instruction, reg1, reg2);
+    printf("\n");
+}
+
 int32_t get_offset(emitter_t *emitter, Slice *var)
 {
     int32_t offset = get_map_offset(emitter->var_map, var);
@@ -82,6 +95,11 @@ int32_t get_offset(emitter_t *emitter, Slice *var)
 void push_variable(emitter_t *emitter, Slice *var, char *reg)
 {
     printf("movq %%%s, %d(%%rbp)\n", reg, get_offset(emitter, var));
+}
+
+void pop_variable(emitter_t *emitter, Slice *var, char *reg)
+{
+    printf("movq %d(%%rbp), %%%s\n", get_offset(emitter, var), reg);
 }
 
 void set_up_assembly(emitter_t *emitter)
@@ -132,4 +150,26 @@ size_t emit_if_number(emitter_t *emitter)
 size_t emit_while_number(emitter_t *emitter)
 {
     return emitter->while_count++;
+}
+
+emitter_t* create_emitter() {
+    emitter_t *em = malloc(sizeof(emitter_t));
+    em->if_count = 0;
+    em->while_count = 0;
+    em->stack_pointer = 0;
+    em->registers = malloc(sizeof(char*) * 13);
+    em->registers[0] = "r15";
+    em->registers[1] = "r14";
+    em->registers[2] = "r13";
+    em->registers[3] = "r12";
+    em->registers[4] = "r11";
+    em->registers[5] = "r10";
+    em->registers[6] = "r9";
+    em->registers[7] = "r8";
+    em->registers[8] = "rcx";
+    em->registers[9] = "rbx";
+    em->registers[10] = "rsi";
+    em->registers[11] = "rdi";
+    em->registers[12] = "rdx";
+    return em;
 }

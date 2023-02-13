@@ -15,6 +15,7 @@
 #include "expression.h"
 #include "statement.h"
 #include "emitter.h"
+#include "block.h"
 
 expression *parse_expression(Interpreter *in);
 statement *parse_statement(Interpreter *in, bool *effects);
@@ -669,12 +670,23 @@ void free_interpreter_internal(Interpreter *in)
     free(in->function_table);
 }
 
+void run_optimize(Interpreter* in)
+{
+    emitter_t* em = create_emitter();
+    bool continue_parsing = true;
+    set_up_assembly(em);
+    
+    statement *state = parse_statement(in, &continue_parsing);
+    compile_method(em, state->internal->declare);
+
+    free(em);
+    clear_ast(in);
+    free_interpreter_internal(in);
+}
+
 void run_compile(Interpreter *in)
 {
-    emitter_t *em = malloc(sizeof(emitter_t));
-    em->if_count = 0;
-    em->while_count = 0;
-    em->stack_pointer = 0;
+    emitter_t* em = create_emitter();
     bool continue_parsing = true;
     // struct map map = {in->symbol_table, in->visited, MAX_SYMBOLS, true};
     // uint64_t return_value = 0;
@@ -772,7 +784,7 @@ int main(int argc, const char *const *const argv)
 
     // run(&x);
 
-    run_compile(&x);
+    run_optimize(&x);
     if (input_len == 0)
     {
         puts("main:");

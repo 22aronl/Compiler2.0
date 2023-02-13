@@ -83,6 +83,8 @@ struct statement
     // uint16_t variables_size;
 };
 
+struct map *create_map();
+void free_map(struct map *map);
 void compile_statement(emitter_t*, statement*);
 void call_function(emitter_t *emitter, struct func *func);
 

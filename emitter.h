@@ -53,3 +53,11 @@ bool align_stack_function(emitter_t *emitter, int16_t offset);
 void realign_stack(emitter_t *emitter, bool change);
 
 void add_rsp(emitter_t *emitter);
+
+emitter_t* create_emitter();
+
+void pop_variable(emitter_t *emitter, Slice *var, char *reg);
+
+void emit_number_to_reg(emitter_t *emitter, char *instruction, uint64_t number, char *reg);
+
+void emit_reg_to_reg(emitter_t *emitter, char *instruction, char *reg1, char *reg2);

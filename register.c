@@ -82,7 +82,7 @@ uint16_t available_registers(registers_t *reg, uint32_t statement_index)
     return k;
 }
 
-int getReg(registers_t *reg, Slice *name)
+int32_t is_in_register(registers_t *reg, Slice* name)
 {
     int32_t name_id = get_map_offset(reg->variable_map, name);
 
@@ -91,7 +91,21 @@ int getReg(registers_t *reg, Slice *name)
         return reg->name_to_register[name_id];
     }
 
-    for (int i = 0; i < REGISTER_SIZE; i++)
+    return -1;
+}
+
+
+
+int16_t get_reg(registers_t *reg, Slice *name)
+{
+    int32_t name_id = get_map_offset(reg->variable_map, name);
+
+    if (reg->name_to_register[name_id] != -1)
+    {
+        return reg->name_to_register[name_id];
+    }
+
+    for (int16_t i = 0; i < REGISTER_SIZE; i++)
     {
         if (reg->registers[i] == -1)
         {
@@ -102,7 +116,7 @@ int getReg(registers_t *reg, Slice *name)
         }
     }
 
-    // TODO:
+    // TODO: if we have register spilling DDDD:
 
     return 0;
 }

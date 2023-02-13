@@ -5,9 +5,11 @@
 #include "block.h"
 #include "slice2.h"
 
-#define REGISTER_SIZE 14
+#define REGISTER_SIZE 13
 
 
 
 registers_t* declare_register(block_t* block);
 uint16_t available_registers(registers_t* reg, uint32_t statement_index);
+int32_t is_in_register(registers_t *reg, Slice* name);
+int16_t get_reg(registers_t *reg, Slice *name);

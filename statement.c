@@ -58,7 +58,7 @@ void declare_function(emitter_t *emitter, struct declare *declare)
         compile_statement(emitter, declare->body[i]);
     }
 
-    emitter->var_offset = old_offset;
+    emitter->var_offset = old_offset; //whats the point of this, the emitter is local
     emitter->var_map = old_map;
     emitter->stack_pointer = old_rsp;
 

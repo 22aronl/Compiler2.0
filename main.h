@@ -25,15 +25,18 @@ typedef struct function_table
     uint64_t size;
     uint64_t cur;
 
-    struct declare* bins;
+    struct declare *bins;
 } hash_map_func;
 
-typedef struct {
-    struct map* var_map;
+typedef struct
+{
+    struct map *var_map;
     size_t stack_pointer;
     size_t if_count;
     size_t while_count;
     uint16_t var_offset;
+
+    char **registers;
 } emitter_t;
 
 typedef struct
@@ -41,9 +44,9 @@ typedef struct
     char *current;
     bool *visited;
     bool *visited_func;
-    hash_map* symbol_table;
-    hash_map_func* function_table;
-    statement** ast;
+    hash_map *symbol_table;
+    hash_map_func *function_table;
+    statement **ast;
     uint32_t size_ast;
     uint32_t cur_ast;
 } Interpreter;
