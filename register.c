@@ -44,9 +44,9 @@ bool is_register_needed(registers_t *reg, int16_t statement_index, uint16_t vari
     return false;
 }
 
-void return_register_to_memory(registers_t *reg, uint16_t variable_index)
+void return_register_to_memory(registers_t *reg, uint16_t register_index)
 {
-    push_variable(reg->emitter, reg->name_array[variable_index], reg->emitter->registers[reg->registers[variable_index]]);
+    push_variable(reg->emitter, reg->name_array[register_index], reg->emitter->registers[register_index]);
 }
 
 void clean_up_block(registers_t *reg)
