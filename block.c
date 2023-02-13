@@ -325,7 +325,8 @@ void create_next_use_information(block_t *block, struct map *map)
     }
 
     block->defined_in_block = malloc(sizeof(bool) * block->variables_index);
-    memset(block->defined_in_block, 0, sizeof(bool) * block->variables_index);
+    for(uint32_t i = 0; i < block->variables_index; i++)
+        block->defined_in_block[i] = false;
     for (uint32_t j = 0; j < block->variables_index; j++)
     {
         for (uint32_t k = 0; k < block->variables[j]->index; k++)
