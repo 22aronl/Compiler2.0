@@ -578,7 +578,7 @@ uint16_t generate_expression(emitter_t *emitter, expression *expr, uint32_t stat
     else
     {
         compile_expression_tree(emitter, reg, expr, block, 0, available_registers);
-        output_register = available_registers[expr->ershov_number - 1];
+        output_register = available_registers[expr->ershov_number];
     }
 
     return output_register;
@@ -591,8 +591,7 @@ void compile_statement_in_block(emitter_t *emitter, statement *stmt, registers_t
     case s_var:
     {
         uint16_t register_index = generate_expression(emitter, stmt->internal->var->expr, statement_index, block, regs);
-        int16_t reg = get_reg(regs, stmt->internal->var->name);
-        move_instruction(emitter, reg, register_index);
+        set_reg(regs, stmt->internal->var->name, register_index);
         break;
     }
     default:

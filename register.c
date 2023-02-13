@@ -94,7 +94,14 @@ int32_t is_in_register(registers_t *reg, Slice* name)
     return -1;
 }
 
+void set_reg(registers_t* regs, Slice* name, int16_t reg)
+{
+    int32_t name_id = get_map_offset(regs->variable_map, name);
 
+    regs->registers[reg] = name_id;
+    regs->name_array[name_id] = name;
+    regs->name_to_register[name_id] = reg;
+}
 
 int16_t get_reg(registers_t *reg, Slice *name)
 {
