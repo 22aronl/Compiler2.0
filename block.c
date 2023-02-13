@@ -315,7 +315,7 @@ void next_use_statement(statement *state, block_t *block, int32_t state_index)
 void create_next_use_information(block_t *block, struct map *map)
 {
     block->variable_map = map;
-    block->variables = malloc(sizeof(int32_t *) * 2);
+    block->variables = malloc(sizeof(struct var_bin *) * 2);
     block->variables_size = 2;
     block->variables_index = 0;
 
