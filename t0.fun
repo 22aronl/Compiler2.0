@@ -1,9 +1,4 @@
 
 fun main() {
-    if(1 == 1) {
-        print(1)
-    }
-    else {
-        print(2)
-    }
+    x = 1 + 2
 }
