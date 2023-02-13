@@ -40,9 +40,6 @@ statement **add_new_block(block_t **blocks, uint32_t *block_index, uint32_t *blo
 
     (*block_index)++;
 
-    cur_statements = malloc(sizeof(statement *) * 2);
-    *cur_statement_size = 2;
-    *cur_statement_index = 0;
     return cur_statements;
 }
 
@@ -100,7 +97,10 @@ void parse_block(statement **body, uint32_t size_body, block_t **block_array, ui
                 cur_statements[cur_statement_index++] = s;
             }
 
-            cur_statements = add_new_block(blocks, block_index, block_size, cur_statements, &cur_statement_index, &cur_statement_size);
+            add_new_block(blocks, block_index, block_size, cur_statements, &cur_statement_index, &cur_statement_size);
+            cur_statements = malloc(sizeof(statement *) * 2);
+            cur_statement_size = 2;
+            cur_statement_index = 0;
 
             if (s->type == s_return)
             {
@@ -112,7 +112,10 @@ void parse_block(statement **body, uint32_t size_body, block_t **block_array, ui
                 {
                     // EVALUATE THE PARAMETERS
                     cur_statements[cur_statement_index++] = s;
-                    cur_statements = add_new_block(blocks, block_index, block_size, cur_statements, &cur_statement_index, &cur_statement_size);
+                    add_new_block(blocks, block_index, block_size, cur_statements, &cur_statement_index, &cur_statement_size);
+                    cur_statements = malloc(sizeof(statement *) * 2);
+                    cur_statement_size = 2;
+                    cur_statement_index = 0;
                 }
                 else if (s->type == s_if)
                 {
@@ -160,8 +163,7 @@ void parse_block(statement **body, uint32_t size_body, block_t **block_array, ui
 
     if (cur_statement_index > 0)
     {
-        cur_statements = add_new_block(blocks, block_index, block_size, cur_statements, &cur_statement_index, &cur_statement_size);
-        free(cur_statements);
+        add_new_block(blocks, block_index, block_size, cur_statements, &cur_statement_index, &cur_statement_size);
     }
 }
 
