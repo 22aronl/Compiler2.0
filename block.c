@@ -566,6 +566,9 @@ uint16_t generate_expression(emitter_t *emitter, expression *expr, uint32_t stat
 
     uint16_t available_registers_size = available_registers(reg, statement_index);
     uint16_t *available_registers = malloc(sizeof(uint16_t) * available_registers_size);
+
+    get_available_registers(reg, available_registers);
+
     uint16_t output_register;
     if (expr->ershov_number > available_registers_size) // Index bounding, need to check
     {
