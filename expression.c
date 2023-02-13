@@ -8,6 +8,101 @@
 #include "statement.h"
 #include "emitter.h"
 
+void add_expr_func(expr_function *expr, struct compile_expr *comp)
+{
+    if (comp->index == comp->size)
+    {
+        comp->size *= 2;
+        comp->function = realloc(comp->function, comp->size * sizeof(expr_function *));
+    }
+    comp->function[comp->index++] = expr;
+}
+
+void comb_expression(expression *e, struct compile_expr *comp)
+{
+
+    switch (e->type)
+    {
+    case t_func:
+    {
+        expr_function *expr = malloc(sizeof(expr_function));
+        expr->function = e->character->function;
+        e->func_number = comp->index;
+        add_expr_func(expr, comp);
+        break;
+    }
+    case t_print:
+    {
+        expr_function *expr = malloc(sizeof(expr_function));
+        expr->print = e->left;
+        e->func_number = comp->index;
+        add_expr_func(expr, comp);
+        break;
+    }
+    case t_not:
+        comb_expression(e->left, comp);
+        break;
+    case t_num:
+    case t_var:
+        break;
+    default:
+        comb_expression(e->left, comp);
+        comb_expression(e->right, comp);
+        break;
+    }
+}
+
+void label_ershov_number(expression *e)
+{
+    switch (e->type)
+    {
+    case t_not:
+        label_ershov_number(e->left);
+        e->ershov_number = e->left->ershov_number;
+        break;
+    case t_print:
+    case t_func:
+    case t_num:
+    case t_var:
+        e->ershov_number = 1;
+        break;
+    default:
+        label_ershov_number(e->left);
+        label_ershov_number(e->right);
+        if (e->left->ershov_number == e->right->ershov_number)
+            e->ershov_number = e->left->ershov_number + 1;
+        else if (e->left->ershov_number > e->right->ershov_number)
+            e->ershov_number = e->left->ershov_number;
+        else
+            e->ershov_number = e->right->ershov_number;
+        break;
+    }
+}
+
+expression* preprocess_expression(expression *e)
+{
+    switch (e->type)
+    {
+        case t_not:
+            if(e->left->type == t_not)
+            {
+                expression *tmp = e->left->left;
+                free(e->left);
+                free(e);
+                e = tmp;
+            }
+            return preprocess_expression(e);
+        case t_num:
+        case t_var:
+        case t_func:
+        case t_print:
+            return e;
+        default:
+            return e;
+    }   
+    //TODO: add more cases
+}
+
 void compile_expression(emitter_t *emitter, expression *e)
 {
     switch (e->type)

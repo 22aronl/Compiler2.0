@@ -2,16 +2,12 @@
 #include <stdbool.h>
 
 #include "hashmap.h"
+#include "block.h"
+#include "slice2.h"
 
 #define REGISTER_SIZE 14
 
-typedef struct {
-    struct map* variable_map;
-    int32_t* registers;
-    bool* used_before;
-    int16_t* name_to_register;
-    uint32_t variables_index;
-    struct var_bin** variables;
-    bool* out_blocks_dag;
-} registers_t;
 
+
+registers_t* declare_register(block_t* block);
+uint16_t available_registers(registers_t* reg, uint32_t statement_index);

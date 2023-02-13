@@ -3,6 +3,9 @@
 
 #include "block.h"
 #include "statement.h"
+#include "expression.h"
+#include "emitter.h"
+#include "register.h"
 
 statement **double_statements(statement ***statements, uint32_t index, uint32_t *block_size)
 {
@@ -387,3 +390,23 @@ void live_variable_analysis(method_t *method)
     }
 }
 
+void generate_functions(emitter_t* emitter, struct compile_expr com_expr, registers_t* regs) {
+    //TODO: eval functions and expressions, and generate code, stick the code into stack
+}
+
+
+
+void generate_expression(emitter_t* emitter, expression* expr, uint32_t statement_index, block_t* block, registers_t* reg) {
+    expr = preprocess_expression(expr);
+    expr_function** functions = malloc(sizeof(expr_function*) * 2);
+    struct compile_expr compile_expr = {functions, 0, 2};
+    comb_expression(expr, &compile_expr);
+    label_ershov_number(expr);
+
+    generate_functions(emitter, compile_expr, reg);
+
+    uint16_t needed_registers = available_registers(reg, statement_index);
+    if(expr->ershov_number > needed_registers) {
+
+    }
+}

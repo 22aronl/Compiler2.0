@@ -38,15 +38,31 @@ typedef union {
     uint64_t value;
 } character;
 
+typedef union {
+    struct func* function;
+    expression* print;
+} expr_function;
+
+struct compile_expr {
+    expr_function** function;
+    uint16_t index;
+    uint16_t size;
+};
 
 struct expression {
     expression* left;
     expression* right;
     character* character;
     enum type_of type;
+    uint16_t func_number;
+    uint16_t ershov_number;
 };
 
 void compile_expression(emitter_t*, expression*);
 
 void free_expression(expression*);
 uint64_t eval_expr(Interpreter*, struct map*, expression*);
+
+void comb_expression(expression *e, struct compile_expr *comp);
+void label_ershov_number(expression *e);
+expression* preprocess_expression(expression *e);

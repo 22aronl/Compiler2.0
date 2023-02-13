@@ -1,5 +1,16 @@
-
+#pragma once    
 #include "statement.h"
+
+typedef struct {
+    struct map* variable_map;
+    int32_t* registers;
+    bool* used_before;
+    int16_t* name_to_register;
+    uint32_t variables_index;
+    struct var_bin** variables;
+    bool* out_blocks_dag;
+    Slice** name_array;
+} registers_t;
 
 struct queue {
     uint32_t block_index;
