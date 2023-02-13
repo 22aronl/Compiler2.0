@@ -29,14 +29,14 @@ registers_t *declare_register(block_t *block, struct map *variable_map, emitter_
 
 bool is_register_needed(registers_t *reg, int16_t statement_index, uint16_t variable_index)
 {
-    uint32_t i = reg->variables[variable_index]->index;
-    for (; i >= 0; i--)
+    
+    for (uint32_t i = reg->variables[variable_index]->index + 1; i > 0; i--)
     {
-        if (reg->variables[variable_index]->vars[i] > statement_index)
+        if (reg->variables[variable_index]->vars[i - 1] > statement_index)
         {
             return true;
         }
-        else if (reg->variables[variable_index]->vars[i] > -statement_index)
+        else if (reg->variables[variable_index]->vars[i - 1] > -statement_index)
         {
             return false;
         }
