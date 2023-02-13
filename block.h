@@ -10,6 +10,8 @@ typedef struct {
     struct var_bin** variables;
     bool* out_blocks_dag;
     Slice** name_array;
+    struct map* function_variable_map;
+    emitter_t* emitter;
 } registers_t;
 
 struct queue {

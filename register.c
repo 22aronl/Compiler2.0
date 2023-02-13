@@ -3,8 +3,9 @@
 #include "register.h"
 #include "block.h"
 #include "slice2.h"
+#include "emitter.h"
 
-registers_t *declare_register(block_t *block)
+registers_t *declare_register(block_t *block, struct map *variable_map, emitter_t *emitter)
 {
     registers_t *reg = malloc(sizeof(registers_t));
     reg->variable_map = block->variable_map;
@@ -20,6 +21,8 @@ registers_t *declare_register(block_t *block)
 
     reg->variables = block->variables;
     reg->out_blocks_dag = block->out_blocks_dag;
+    reg->function_variable_map = variable_map;
+    reg->emitter = emitter;
 
     return reg;
 }
@@ -43,7 +46,19 @@ bool is_register_needed(registers_t *reg, int16_t statement_index, uint16_t vari
 
 void return_register_to_memory(registers_t *reg, uint16_t variable_index)
 {
-    // TODO:
+    push_variable(reg->emitter, reg->name_array[variable_index], reg->emitter->registers[reg->registers[variable_index]]);
+}
+
+void clean_up_block(registers_t *reg)
+{
+    for (uint16_t i = 0; i < REGISTER_SIZE; i++)
+    {
+        if (reg->registers[i] != -1 && reg->out_blocks_dag[reg->registers[i]])
+        {
+            return_register_to_memory(reg, reg->registers[i]);
+            reg->registers[i] = -1;
+        }
+    }
 }
 
 void get_available_registers(registers_t *reg, uint16_t *array)
@@ -82,7 +97,7 @@ uint16_t available_registers(registers_t *reg, uint32_t statement_index)
     return k;
 }
 
-int32_t is_in_register(registers_t *reg, Slice* name)
+int32_t is_in_register(registers_t *reg, Slice *name)
 {
     int32_t name_id = get_map_offset(reg->variable_map, name);
 
@@ -94,7 +109,7 @@ int32_t is_in_register(registers_t *reg, Slice* name)
     return -1;
 }
 
-void set_reg(registers_t* regs, Slice* name, int16_t reg)
+void set_reg(registers_t *regs, Slice *name, int16_t reg)
 {
     int32_t name_id = get_map_offset(regs->variable_map, name);
 

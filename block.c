@@ -617,15 +617,18 @@ void compile_method(emitter_t *emitter, struct declare *declare)
 
     emit_start_function(emitter, declare->name);
 
+    //Declare my variables
+
     for (uint32_t i = 0; i < method->block_size; i++)
     {
         block_t *block = method->blocks[i];
-        registers_t *reg = declare_register(block);
+        registers_t *reg = declare_register(block, new_map, emitter);
 
         for (uint32_t j = 0; j < block->statement_size; j++)
         {
             statement *stmt = block->statements[j];
             compile_statement_in_block(emitter, stmt, reg, block, j);
+            clean_up_block(reg);
         }
 
         free(reg);

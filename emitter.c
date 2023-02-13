@@ -97,6 +97,7 @@ void push_variable(emitter_t *emitter, Slice *var, char *reg)
     printf("movq %%%s, %d(%%rbp)\n", reg, get_offset(emitter, var));
 }
 
+
 void pop_variable(emitter_t *emitter, Slice *var, char *reg)
 {
     printf("movq %d(%%rbp), %%%s\n", get_offset(emitter, var), reg);
