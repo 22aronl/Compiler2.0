@@ -146,6 +146,10 @@ void parse_block(statement **body, uint32_t size_body, block_t **block_array, ui
             }
         }
     }
+
+    if(cur_statement_index > 0)
+        add_new_block(blocks, block_index, block_size, cur_statements, &cur_statement_index, &cur_statement_size);
+        
 }
 
 method_t *parse_method(struct declare *declare)
