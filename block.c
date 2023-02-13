@@ -172,7 +172,7 @@ method_t *parse_method(struct declare *declare)
     method_t *method = malloc(sizeof(method_t));
 
     block_t *exit_block = malloc(sizeof(block_t));
-    exit_block->in_blocks = malloc(sizeof(uint32_t));
+    exit_block->in_blocks = malloc(sizeof(uint32_t) * 2);
     exit_block->in_blocks_index = 0;
     exit_block->in_blocks_size = 2;
 
@@ -183,7 +183,7 @@ method_t *parse_method(struct declare *declare)
     struct map *map = create_small_map();
 
     // The In Block
-    blocks[0] = malloc(sizeof(block_t *));
+    blocks[0] = malloc(sizeof(block_t));
     blocks[0]->out_blocks = malloc(sizeof(uint32_t));
     blocks[0]->out_blocks_index = 0;
     blocks[0]->out_blocks_size = 2;
