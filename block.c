@@ -566,12 +566,12 @@ uint16_t generate_expression(emitter_t *emitter, expression *expr, uint32_t stat
     if (expr->ershov_number > available_registers_size) // Index bounding, need to check
     {
         compile_uneven_expression_tree(emitter, reg, expr, block, available_registers, available_registers_size);
-        output_register = available_registers[available_registers_size - 1];
+        output_register = available_registers[available_registers_size - 1]; //Might be minus 2?
     }
     else
     {
         compile_expression_tree(emitter, reg, expr, block, 0, available_registers);
-        output_register = available_registers[expr->ershov_number];
+        output_register = available_registers[expr->ershov_number - 1];
     }
 
     return output_register;
