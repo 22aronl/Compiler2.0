@@ -222,17 +222,10 @@ method_t *parse_method(struct declare *declare)
 
 void add_to_variables(block_t *block, int32_t input, int32_t hash)
 {
-    if (hash >= block->variables_index)
+    while (hash >= block->variables_size)
     {
-        while (block->variables_index >= block->variables_size)
-        {
-            block->variables_size *= 2;
-            block->variables = realloc(block->variables, sizeof(struct var_bin *) * block->variables_size);
-        }
-        block->variables[hash] = malloc(sizeof(struct var_bin));
-        block->variables[hash]->vars = malloc(sizeof(int32_t) * 2);
-        block->variables[hash]->index = 0;
-        block->variables[hash]->size = 2;
+        block->variables_size *= 2;
+        block->variables = realloc(block->variables, sizeof(struct var_bin *) * block->variables_size);
     }
     // Check if the struct is created in the block
     if (block->variables[hash] == NULL)
