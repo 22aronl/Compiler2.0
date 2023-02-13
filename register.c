@@ -113,7 +113,7 @@ int32_t is_in_register(registers_t *reg, Slice *name)
 
 void set_reg(registers_t *regs, Slice *name, int16_t reg)
 {
-    printf("NAME: %.*s", name->len, name->start);
+    printf("NAME: %.*s", (int)name->len, name->start);
     int32_t name_id = get_map_offset(regs->variable_map, name);
     regs->registers[reg] = name_id;
     regs->name_array[name_id] = name;
