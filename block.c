@@ -157,6 +157,8 @@ method_t *parse_method(struct declare *declare)
     uint32_t block_size = 2;
     uint32_t block_index = 1;
 
+    struct map* map = create_small_map();
+
     // The In Block
     blocks[0] = malloc(sizeof(block_t *));
     blocks[0]->out_blocks = malloc(sizeof(uint32_t));
@@ -172,7 +174,7 @@ method_t *parse_method(struct declare *declare)
         {
             add_to_in(blocks[blocks[i]->out_blocks[j]], i);
         }
-        create_next_use_information(blocks[i]);
+        create_next_use_information(blocks[i], map);
         blocks[i]->out_blocks_size_dag = blocks[i]->out_blocks_index;
         blocks[i]->out_blocks_dag = malloc(sizeof(bool) * blocks[i]->variables_index);
     }
@@ -292,9 +294,9 @@ void next_use_statement(statement *state, block_t *block, int32_t state_index)
     }
 }
 
-void create_next_use_information(block_t *block)
+void create_next_use_information(block_t *block, struct map* map)
 {
-    block->variable_map = create_small_map();
+    block->variable_map = map;
     block->variables = malloc(sizeof(int32_t *) * 2);
     block->variables_size = 2;
     block->variables_index = 0;
@@ -328,10 +330,11 @@ void create_next_use_information(block_t *block)
 struct map *create_small_map()
 {
     struct map *map = malloc(sizeof(struct map));
-    map->map = malloc(20 * sizeof(hash_map));
-    map->visited = malloc(20 * sizeof(bool));
-    memset(map->visited, 0, 20 * sizeof(bool));
-    map->size = 20;
+    uint16_t size = 40;
+    map->map = malloc(size * sizeof(hash_map));
+    map->visited = malloc(size * sizeof(bool));
+    memset(map->visited, 0, size * sizeof(bool));
+    map->size = size;
     map->main = false;
     return map;
 }
@@ -383,3 +386,4 @@ void live_variable_analysis(method_t *method)
         start_queue = start_queue->next;
     }
 }
+

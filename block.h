@@ -38,6 +38,7 @@ typedef struct {
     bool* defined_in_block;
 } block_t;
 
+
 typedef struct {
     block_t** blocks;
     uint32_t block_size;
@@ -48,5 +49,5 @@ typedef struct {
 
 method_t* parse_method(struct declare * declare);
 struct map* create_small_map();
-void create_next_use_information(block_t *block);
+void create_next_use_information(block_t *block, struct map* map);
 void live_variable_analysis(method_t *method);
