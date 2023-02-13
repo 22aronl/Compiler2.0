@@ -323,7 +323,7 @@ void create_next_use_information(block_t *block, struct map *map)
         next_use_statement(s, block, i - 1);
     }
 
-    if (block->variables_index == 0)
+    if (block->variables_index > 0)
     {
         block->defined_in_block = malloc(sizeof(bool) * block->variables_index);
         for (uint32_t i = 0; i < block->variables_index; i++)
