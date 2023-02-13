@@ -312,7 +312,7 @@ void create_next_use_information(block_t *block, struct map *map)
     block->variables_size = 2;
     block->variables_index = 0;
 
-    if (!block->has_jump && !block->unconditional_jump)
+    if (block->has_jump && !block->unconditional_jump)
     {
         next_use_expression(block->jump_expression, block, block->statement_size);
     }
