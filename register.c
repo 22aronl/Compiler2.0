@@ -29,7 +29,7 @@ registers_t *declare_register(block_t *block, struct map *variable_map, emitter_
 
 bool is_register_needed(registers_t *reg, int16_t statement_index, uint16_t variable_index)
 {
-    
+
     for (uint32_t i = reg->variables[variable_index]->index + 1; i > 0; i--)
     {
         if (reg->variables[variable_index]->vars[i - 1] > statement_index)
@@ -54,8 +54,8 @@ void clean_up_block(registers_t *reg)
 {
     for (uint16_t i = 0; i < REGISTER_SIZE; i++)
     {
-        if(reg->registers[i] != -1)
-        //if (reg->registers[i] != -1 && reg->out_blocks_dag[reg->registers[i]])
+        if (reg->registers[i] != -1)
+        // if (reg->registers[i] != -1 && reg->out_blocks_dag[reg->registers[i]])
         {
             return_register_to_memory(reg, reg->registers[i]);
             reg->registers[i] = -1;
@@ -84,13 +84,9 @@ uint16_t available_registers(registers_t *reg, uint32_t statement_index)
         {
             k++;
         }
-    }
-
-    for (uint16_t i = 0; i < reg->variables_index; i++)
-    {
-        if (!is_register_needed(reg, statement_index, i))
+        else if (!is_register_needed(reg, statement_index, reg->registers[i]))
         {
-            reg->registers[i] = -1;
+            // reg->registers[i] = -1;
             return_register_to_memory(reg, i);
             k++;
         }
