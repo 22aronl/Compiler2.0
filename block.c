@@ -589,6 +589,8 @@ void compile_method(emitter_t *emitter, struct declare *declare)
 
     method_t *method = parse_method(declare);
 
+    emit_start_function(emitter, declare->name);
+
     for (uint32_t i = 0; i < method->block_size; i++)
     {
         block_t *block = method->blocks[i];
