@@ -160,7 +160,7 @@ method_t *parse_method(struct declare *declare)
     uint32_t block_size = 2;
     uint32_t block_index = 1;
 
-    struct map* map = create_small_map();
+    struct map *map = create_small_map();
 
     // The In Block
     blocks[0] = malloc(sizeof(block_t *));
@@ -297,7 +297,7 @@ void next_use_statement(statement *state, block_t *block, int32_t state_index)
     }
 }
 
-void create_next_use_information(block_t *block, struct map* map)
+void create_next_use_information(block_t *block, struct map *map)
 {
     block->variable_map = map;
     block->variables = malloc(sizeof(int32_t *) * 2);
@@ -356,8 +356,8 @@ void live_variable_analysis(method_t *method)
 
         for (uint32_t i = 0; i < blocks->variables_index; i++)
         {
-            struct var_bin* var = blocks->variables[i];
-            if((var != NULL && var->index > 0 && var->vars[var->index - 1] > 0) || (blocks->out_blocks_dag[i] && !blocks->defined_in_block[i]))
+            struct var_bin *var = blocks->variables[i];
+            if ((var != NULL && var->index > 0 && var->vars[var->index - 1] > 0) || (blocks->out_blocks_dag[i] && !blocks->defined_in_block[i]))
                 blocks->in_blocks_dag[i] = true;
         }
 
@@ -390,23 +390,144 @@ void live_variable_analysis(method_t *method)
     }
 }
 
-void generate_functions(emitter_t* emitter, struct compile_expr com_expr, registers_t* regs) {
-    //TODO: eval functions and expressions, and generate code, stick the code into stack
+void store_instruction(emitter_t *emitter, uint16_t reg)
+{
+    // TODO: DO THIS
 }
 
+void unstore_instruction(emitter_t *emitter, uint16_t reg)
+{
+    // TODO: DO THIS
+}
 
+void generate_functions(emitter_t *emitter, struct compile_expr com_expr, registers_t *regs)
+{
+    // TODO: eval functions and expressions, and generate code, stick the code into stack
+}
 
-void generate_expression(emitter_t* emitter, expression* expr, uint32_t statement_index, block_t* block, registers_t* reg) {
+void generate_variable(emitter_t *emitter, Slice *name, uint16_t base)
+{
+    // TODO: generate code for variable
+}
+
+void generate_number(emitter_t *emitter, uint64_t number, uint16_t base)
+{
+    // TODO: generate code for variable
+}
+
+void generate_instruction(emitter_t *emitter, enum type_of type, uint16_t src, uint16_t dest)
+{
+    // TODO: generate code for instruction
+}
+
+void move_instruction(emitter_t *emitter, uint16_t src, uint16_t dest)
+{
+    // TODO: generate code for move instruction
+}
+
+/**
+ * Assumes the number of registers available is greater than or equal to the number of registers needed
+ */
+void compile_expression_tree(emitter_t *emitter, expression *expr, block_t *block, uint16_t base, uint16_t *available_registers)
+{
+    switch (expr->type)
+    {
+    case t_var:
+        generate_variable(emitter, expr->character->name, available_registers[base]);
+        break;
+    case t_num:
+        generate_number(emitter, expr->character->value, available_registers[base]);
+        break;
+    case t_func:
+        break;
+    case t_print:
+        break;
+    case t_not:
+        compile_expression_tree(emitter, expr->left, block, base, available_registers);
+        break;
+    default:
+    {
+        uint16_t l_ershov = expr->left->ershov_number;
+        uint16_t r_ershov = expr->right->ershov_number;
+
+        if (l_ershov == r_ershov)
+        {
+            compile_expression_tree(emitter, expr->right, block, base + 1, available_registers);
+            compile_expression_tree(emitter, expr->left, block, base, available_registers);
+            generate_instruction(emitter, expr->type, available_registers[base + l_ershov - 1], available_registers[base + l_ershov]);
+        }
+        else if (l_ershov > r_ershov)
+        {
+            compile_expression_tree(emitter, expr->left, block, base, available_registers);
+            compile_expression_tree(emitter, expr->right, block, base, available_registers);
+            generate_instruction(emitter, expr->type, available_registers[base + r_ershov - 1], available_registers[base + l_ershov - 1]);
+        }
+        else
+        {
+            compile_expression_tree(emitter, expr->right, block, base, available_registers);
+            compile_expression_tree(emitter, expr->left, block, base, available_registers);
+            generate_instruction(emitter, expr->type, available_registers[base + r_ershov - 1], available_registers[base + l_ershov - 1]);
+            move_instruction(emitter, available_registers[base + l_ershov - 1], available_registers[base + r_ershov - 1]);
+        }
+        break;
+    }
+    }
+}
+
+void compile_uneven_expression_tree(emitter_t *emitter, expression *expr, block_t *block, uint16_t *available_registers, uint16_t available_registers_size)
+{
+    uint16_t l_ershov = expr->left->ershov_number;
+    uint16_t r_ershov = expr->right->ershov_number;
+
+    if(!(l_ershov > available_registers_size || r_ershov > available_registers_size))
+    {
+        compile_expression_tree(emitter, expr, block, available_registers_size, available_registers);
+        return;
+    }
+
+    if (l_ershov >= r_ershov)
+    {
+        compile_uneven_expression_tree(emitter, expr->left, block, available_registers, available_registers_size);
+        store_instruction(emitter, available_registers[available_registers_size - 1]);
+        if (r_ershov > available_registers_size)
+            compile_uneven_expression_tree(emitter, expr->right, block, available_registers, available_registers_size);
+        else
+            compile_expression_tree(emitter, expr->right, block, available_registers_size - r_ershov, available_registers);
+        unstore_instruction(emitter, available_registers[available_registers_size - 2]);
+        generate_instruction(emitter, expr->type, available_registers[available_registers_size - 2], available_registers[available_registers_size - 1]);
+    }
+    else
+    {
+        compile_uneven_expression_tree(emitter, expr->right, block, available_registers, available_registers_size);
+        store_instruction(emitter, available_registers[available_registers_size - 1]);
+        if (l_ershov > available_registers_size)
+            compile_uneven_expression_tree(emitter, expr->left, block, available_registers, available_registers_size);
+        else
+            compile_expression_tree(emitter, expr->left, block, available_registers_size - l_ershov, available_registers);
+        unstore_instruction(emitter, available_registers[available_registers_size - 2]);
+        generate_instruction(emitter, expr->type, available_registers[available_registers_size - 1], available_registers[available_registers_size - 2]);
+        move_instruction(emitter, available_registers[available_registers_size - 2], available_registers[available_registers_size - 1]);
+    }
+}
+
+void generate_expression(emitter_t *emitter, expression *expr, uint32_t statement_index, block_t *block, registers_t *reg)
+{
     expr = preprocess_expression(expr);
-    expr_function** functions = malloc(sizeof(expr_function*) * 2);
+    expr_function **functions = malloc(sizeof(expr_function *) * 2);
     struct compile_expr compile_expr = {functions, 0, 2};
     comb_expression(expr, &compile_expr);
     label_ershov_number(expr);
 
     generate_functions(emitter, compile_expr, reg);
 
-    uint16_t needed_registers = available_registers(reg, statement_index);
-    if(expr->ershov_number > needed_registers) {
-
+    uint16_t available_registers_size = available_registers(reg, statement_index);
+    uint16_t *available_registers = malloc(sizeof(uint16_t) * available_registers_size);
+    if (expr->ershov_number > available_registers_size) // Index bounding, need to check
+    {
+        compile_uneven_expression_tree(emitter, expr, block, available_registers, available_registers_size);
+    }
+    else
+    {
+        compile_expression_tree(emitter, expr, block, 0, available_registers);
     }
 }
