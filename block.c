@@ -8,15 +8,15 @@
 #include "register.h"
 #include "hashmap.h"
 
-statement **double_statements(statement ***statements, uint32_t index, uint32_t *block_size)
+statement **double_statements(statement **statements, uint32_t index, uint32_t *block_size)
 {
     if (index == *block_size)
     {
         *block_size *= 2;
-        statement **new_statements = realloc(&statements, sizeof(statement *) * *block_size);
+        statement **new_statements = realloc(statements, sizeof(statement *) * *block_size);
         return new_statements;
     }
-    return *statements;
+    return statements;
 }
 
 statement **add_new_block(block_t **blocks, uint32_t *block_index, uint32_t *block_size, statement **cur_statements, uint32_t *cur_statement_index, uint32_t *cur_statement_size)
@@ -80,7 +80,11 @@ void parse_block(statement **body, uint32_t size_body, block_t **block_array, ui
         // REMOVE PRINT STATEMENTS
         if (s->type == s_var || s->type == s_print)
         {
-            cur_statements = double_statements(&cur_statements, cur_statement_index, &cur_statement_size);
+            if (cur_statement_index == cur_statement_size)
+            {
+                cur_statements = realloc(cur_statements, sizeof(statement *) * cur_statement_size * 2);
+                cur_statement_size *= 2;
+            }
             cur_statements[cur_statement_index++] = s;
         }
         else
@@ -88,7 +92,11 @@ void parse_block(statement **body, uint32_t size_body, block_t **block_array, ui
 
             if (s->type == s_return)
             {
-                cur_statements = double_statements(&cur_statements, cur_statement_index, &cur_statement_size);
+                if (cur_statement_index == cur_statement_size)
+                {
+                    cur_statements = realloc(cur_statements, sizeof(statement *) * cur_statement_size * 2);
+                    cur_statement_size *= 2;
+                }
                 cur_statements[cur_statement_index++] = s;
             }
 
