@@ -257,7 +257,7 @@ void add_to_next_use(block_t *block, Slice *name, int32_t state_index)
     int32_t index = get_map_offset(block->variable_map, name);
     if (index == 0)
     {
-        index = block->variables_index + 1;
+        index = block->variables_index++;
         add_map_offset(block->variable_map, name, index);
     }
     add_to_variables(block, state_index, index);
