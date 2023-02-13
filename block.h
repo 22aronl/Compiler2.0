@@ -27,6 +27,7 @@ struct var_bin {
 typedef struct {
     statement** statements;
     uint32_t statement_size;
+    bool has_jump;
     bool unconditional_jump;
     expression* jump_expression;
     // int32_t* expr_vars;

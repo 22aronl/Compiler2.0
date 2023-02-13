@@ -29,6 +29,7 @@ statement **add_new_block(block_t **blocks, uint32_t *block_index, uint32_t *blo
     blocks[*block_index] = malloc(sizeof(block_t));
     blocks[*block_index]->statements = cur_statements;
     blocks[*block_index]->statement_size = *cur_statement_index;
+    blocks[*block_index]->has_jump = false;
     blocks[*block_index]->unconditional_jump = true;
     blocks[*block_index]->out_blocks = malloc(sizeof(uint32_t));
     blocks[*block_index]->out_blocks_index = 0;
@@ -108,6 +109,7 @@ void parse_block(statement **body, uint32_t size_body, block_t **block_array, ui
                 else if (s->type == s_if)
                 {
                     uint32_t current_block = *block_index - 1;
+                    blocks[current_block]->has_jump = true;
                     blocks[current_block]->unconditional_jump = false;
                     blocks[current_block]->jump_expression = s->internal->if_statement->condition;
 
@@ -132,6 +134,7 @@ void parse_block(statement **body, uint32_t size_body, block_t **block_array, ui
                 else if (s->type == s_while)
                 {
                     uint32_t current_block = *block_index - 1;
+                    blocks[current_block]->has_jump = true;
                     blocks[current_block]->unconditional_jump = false;
                     blocks[current_block]->jump_expression = s->internal->while_statement->condition;
 
@@ -149,7 +152,7 @@ void parse_block(statement **body, uint32_t size_body, block_t **block_array, ui
 
     if(cur_statement_index > 0)
         add_new_block(blocks, block_index, block_size, cur_statements, &cur_statement_index, &cur_statement_size);
-        
+
 }
 
 method_t *parse_method(struct declare *declare)
@@ -309,7 +312,7 @@ void create_next_use_information(block_t *block, struct map *map)
     block->variables_size = 2;
     block->variables_index = 0;
 
-    if (!block->unconditional_jump)
+    if (!block->has_jump && !block->unconditional_jump)
     {
         next_use_expression(block->jump_expression, block, block->statement_size);
     }
