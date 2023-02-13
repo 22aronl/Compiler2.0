@@ -53,7 +53,7 @@ void get_available_registers(registers_t *reg, uint16_t *array)
     {
         if (reg->registers[i] == -1)
         {
-            array[index] = i;
+            array[index++] = i;
         }
     }
 }
