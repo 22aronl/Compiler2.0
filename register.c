@@ -33,7 +33,7 @@ bool is_register_needed(registers_t *reg, int16_t statement_index, uint16_t vari
     for (uint32_t i = reg->variables[variable_index]->index; i > 0; i--)
     {
         int32_t var = reg->variables[variable_index]->vars[i - 1];
-        if (var > statement_index)
+        if (var >= statement_index)
         {
             return true;
         }
