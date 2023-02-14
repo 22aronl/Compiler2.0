@@ -638,6 +638,7 @@ void compile_method(emitter_t *emitter, struct declare *declare)
 
     // Declare my variables
     struct queue_head *queue = method->queue_head;
+    uint16_t counter = 0;
     if (queue->head->has_next)
     {
         struct queue_name *q_cur = queue->head->next;
@@ -648,6 +649,7 @@ void compile_method(emitter_t *emitter, struct declare *declare)
             if (offset == 0)
             {
                 declare_variable(emitter, q_cur->name, -(emitter->var_offset++) * 8);
+                counter++;
             }
             struct queue_name* q_current = q_cur;
             q_cur = q_current->next;
@@ -659,6 +661,9 @@ void compile_method(emitter_t *emitter, struct declare *declare)
         free(queue->head);
     }
     free(queue);
+
+    if(counter > 0)
+        shift_stack(emitter, counter);
 
     for (uint32_t i = 0; i < method->block_size; i++)
     {
