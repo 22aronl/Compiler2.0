@@ -19,8 +19,9 @@ expression* preprocess_expression(expression *e)
                 free(e->left);
                 free(e);
                 e = tmp;
+                return preprocess_expression(e);
             }
-            return preprocess_expression(e);
+            return e;
         case t_num:
         case t_var:
         case t_func:
