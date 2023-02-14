@@ -270,11 +270,11 @@ expression *parse_value(Interpreter *in)
             }
             else // otherwise its a normal function
             {
-                if (slice_eq(sl, "printf"))
-                {
-                    free(sl);
-                    sl = slice_construct("printf_", 7);
-                }
+                // if (slice_eq(sl, "printf"))
+                // {
+                //     free(sl);
+                //     sl = slice_construct("printf_", 7);
+                // }
                 struct func *func = malloc(sizeof(struct func));
 
                 expression **args = malloc(sizeof(expression *));
@@ -533,11 +533,11 @@ statement *parse_statement(Interpreter *in, bool *continue_parsing)
     else if (eat(in, "fun"))
     {
         Slice *name = consume_token(in);
-        if (slice_eq(name, "printf"))
-        {
-            free(name);
-            name = slice_construct("printf_", 7);
-        }
+        // if (slice_eq(name, "printf"))
+        // {
+        //     free(name);
+        //     name = slice_construct("printf_", 7);
+        // }
         consume_or_fail(in, "(");
         Slice *args = malloc(sizeof(Slice));
         uint16_t args_size = 0;
@@ -584,11 +584,11 @@ statement *parse_statement(Interpreter *in, bool *continue_parsing)
             }
             else
             {
-                if (slice_eq(name, "printf"))
-                {
-                    free(name);
-                    name = slice_construct("printf_", 7);
-                }
+                // if (slice_eq(name, "printf"))
+                // {
+                //     free(name);
+                //     name = slice_construct("printf_", 7);
+                // }
                 expression **args = malloc(sizeof(expression *));
                 uint16_t args_size = 0;
                 args = parse_args2(in, args, &args_size);
@@ -773,12 +773,13 @@ int main(int argc, const char *const *const argv)
     // run(&x);
 
     run_compile(&x);
-    if (input_len == 0)
-    {
-        puts("main:");
-        puts("movq $0, %rax");
-        puts("retq");
-    }
+    // if (input_len == 0)
+    // {
+    //     puts("main:");
+    //     puts("movq $0, %rax");
+    //     puts("retq");
+    // }
+    free(input);
 
     return 0;
 }
