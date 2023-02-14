@@ -228,7 +228,7 @@ expression **parse_args2(Interpreter *in, expression **args, uint16_t *num_args)
             args_capacity *= 2;
             args = realloc(args, args_capacity * sizeof(expression *));
         }
-        args[args_size++] = preprocess_expression(parse_expression(in));
+        args[args_size++] = parse_expression(in);
 
     } while (consume(in, ","));
     consume_or_fail(in, ")");
@@ -243,7 +243,7 @@ expression *parse_value(Interpreter *in)
 {
     if (consume(in, "("))
     {
-        expression *left = preprocess_expression(parse_expression(in));
+        expression *left = parse_expression(in);
         consume_or_fail(in, ")");
         return left;
     }
@@ -265,7 +265,7 @@ expression *parse_value(Interpreter *in)
             {
                 free(sl);
                 expr->type = t_print;
-                expr->left = preprocess_expression(parse_expression(in));
+                expr->left = parse_expression(in);
                 consume_or_fail(in, ")");
             }
             else // otherwise its a normal function
@@ -445,7 +445,7 @@ expression *parse_or_expr(Interpreter *in)
  */
 expression *parse_expression(Interpreter *in)
 {
-    return parse_or_expr(in);
+    return preprocess_expression(parse_or_expr(in));
 }
 
 /**
@@ -481,7 +481,7 @@ statement *parse_statement(Interpreter *in, bool *continue_parsing)
     if (eat(in, "if"))
     {
         consume_or_fail(in, "("); // if the statement is an if statement
-        expression *condition = preprocess_expression(parse_expression(in));
+        expression *condition = parse_expression(in);
         consume_or_fail(in, ")");
         consume_or_fail(in, "{");
         statement **body = malloc(sizeof(statement *));
@@ -515,7 +515,7 @@ statement *parse_statement(Interpreter *in, bool *continue_parsing)
     else if (eat(in, "while"))
     {
         consume_or_fail(in, "("); // if the statement is a while statement
-        expression *condition = preprocess_expression(parse_expression(in));
+        expression *condition = parse_expression(in);
         consume_or_fail(in, ")");
         consume_or_fail(in, "{");
         statement **body = malloc(sizeof(statement *));
@@ -558,7 +558,7 @@ statement *parse_statement(Interpreter *in, bool *continue_parsing)
     }
     else if (eat(in, "return"))
     {
-        expression *expr = preprocess_expression(parse_expression(in));
+        expression *expr = parse_expression(in);
         struct return_statement *return_statement = malloc(sizeof(struct return_statement));
         return_statement->expr = expr;
 
@@ -573,7 +573,7 @@ statement *parse_statement(Interpreter *in, bool *continue_parsing)
             if (slice_eq(name, "print")) // checks to see if the function is print
             {
                 free(name);
-                expression *expr = preprocess_expression(parse_expression(in));
+                expression *expr = parse_expression(in);
                 consume_or_fail(in, ")");
 
                 struct print *print = malloc(sizeof(struct print));
@@ -604,7 +604,7 @@ statement *parse_statement(Interpreter *in, bool *continue_parsing)
         else
         {
             consume_or_fail(in, "="); // statement is assignemtn
-            expression *expr = preprocess_expression(parse_expression(in));
+            expression *expr = parse_expression(in);
             struct var *var = malloc(sizeof(struct var));
             var->name = name;
             var->expr = expr;
