@@ -725,6 +725,11 @@ void compile_statement_in_block(emitter_t *emitter, statement *stmt, registers_t
         printf("YA DONE GOOFED");
         break;
     }
+    default:
+    {
+        printf("YA DONE GOOFED2");
+        break;
+    }
     }
 }
 
