@@ -19,7 +19,7 @@ statement **double_statements(statement **statements, uint32_t index, uint32_t *
     return statements;
 }
 
-block_t** add_new_block(block_t **blocks, uint32_t *block_index, uint32_t *block_size, statement **cur_statements, uint32_t *cur_statement_index, uint32_t *cur_statement_size)
+block_t **add_new_block(block_t **blocks, uint32_t *block_index, uint32_t *block_size, statement **cur_statements, uint32_t *cur_statement_index, uint32_t *cur_statement_size)
 {
     if (*block_index == *block_size)
     {
@@ -63,7 +63,7 @@ void add_to_in(block_t *block, uint32_t index)
     block->in_blocks[block->in_blocks_index++] = index;
 }
 
-block_t** parse_block(statement **body, uint32_t size_body, block_t **blocks, uint32_t *block_index, uint32_t *block_size, block_t *exit_block)
+block_t **parse_block(statement **body, uint32_t size_body, block_t **blocks, uint32_t *block_index, uint32_t *block_size, block_t *exit_block)
 {
 
     statement **cur_statements = malloc(sizeof(statement *) * 2);
@@ -713,6 +713,7 @@ void compile_method(emitter_t *emitter, struct declare *declare)
     for (uint32_t i = 0; i < method->block_size; i++)
     {
         block_t *block = method->blocks[i];
+        emit_number(emitter, "label%d_: ", block->block_label);
         registers_t *reg = declare_register(block, new_map, emitter);
 
         for (uint32_t j = 0; j < block->statement_size; j++)
