@@ -70,6 +70,7 @@ typedef struct {
     uint32_t block_label;
     bool is_while;
     uint32_t while_block_label;
+    bool* variables_visited;
 } block_t;
 
 

@@ -243,12 +243,18 @@ void add_to_variables(block_t *block, int32_t input, int32_t hash)
 {
     while (hash >= block->variables_size)
     {
+        block->variables_visited = realloc(block->variables_visited, sizeof(bool) * block->variables_size * 2);
+        for(uint32_t i = block->variables_size; i < block->variables_size * 2; i++)
+        {
+            block->variables_visited[i] = false;
+        }
         block->variables_size *= 2;
         block->variables = realloc(block->variables, sizeof(struct var_bin *) * block->variables_size);
     }
     // Check if the struct is created in the block
-    if (block->variables[hash] == NULL || block->variables[hash]->vars == NULL)
+    if (block->variables_visited[hash])
     {
+        block->variables_visited[hash] = true;
         block->variables[hash] = malloc(sizeof(struct var_bin));
         block->variables[hash]->vars = malloc(sizeof(int32_t) * 2);
         block->variables[hash]->index = 0;
@@ -346,6 +352,7 @@ void create_next_use_information(block_t *block, struct map *map, struct queue_h
 {
     block->variable_map = map;
     block->variables = malloc(sizeof(struct var_bin *) * 2);
+    block->variables_visited = calloc(2, sizeof(bool));
     block->variables_size = 2;
     block->variables_index = 0;
 
