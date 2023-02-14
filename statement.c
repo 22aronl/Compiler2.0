@@ -50,7 +50,7 @@ void declare_function(emitter_t *emitter, struct declare *declare)
 
     for (uint16_t i = 0; i < declare->args; i++)
     {
-        declare_variable(emitter, &declare->parameters[i], i * 8 + 16);
+        declare_variable(emitter, &declare->parameters[i], (declare->args - i - 1) * 8 + 16);
     }
 
     for (uint32_t i = 0; i < declare->size_body; i++)
@@ -75,7 +75,7 @@ void call_function(emitter_t *emitter, struct func *func)
     bool change = align_stack_function(emitter, func->args);
     for (uint16_t i = 0; i < func->args; i++)
     {
-        compile_expression(emitter, func->parameters[func->args - i - 1]);
+        compile_expression(emitter, func->parameters[i]);
     }
     emit_name(emitter, "call %.*s\n", func->name);
     
