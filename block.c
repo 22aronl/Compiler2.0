@@ -450,9 +450,18 @@ void unstore_instruction(emitter_t *emitter, uint16_t reg)
     pop_register(emitter, emitter->registers[reg]);
 }
 
-void create_function_stack(emitter_t *emitter, struct compile_expr com_expr, registers_t *regs)
+void function_call_instruction(emitter_t* emitter, struct function* func, registers_t* regs)
 {
-    // TODO: eval functions and expressions, and generate code, stick the code into stack
+    //TODO: ADD support
+}
+
+void create_function_stack(emitter_t *emitter, struct compile_expr *com_expr, registers_t *regs)
+{
+    for (uint16_t i = 0; i < com_expr->index; i++)
+    {
+        function_call_instruction(emitter, com_expr->functions[i]->function, regs);
+        push_register(emitter, "rax");
+    }
 }
 
 void move_instruction(emitter_t *emitter, uint16_t src, uint16_t dest)
@@ -463,6 +472,11 @@ void move_instruction(emitter_t *emitter, uint16_t src, uint16_t dest)
 void move_output_instruction(emitter_t *emitter, uint16_t src, char *dest)
 {
     emit_reg_to_reg(emitter, "movq %%%s, %%%s", emitter->registers[src], dest);
+}
+
+void generate_function(emitter_t * emitter, registers_t*regs, uint16_t base)
+{
+    //TODO: add support
 }
 
 void generate_variable(emitter_t *emitter, registers_t *regs, Slice *name, uint16_t base)
@@ -514,6 +528,7 @@ void compile_expression_tree(emitter_t *emitter, registers_t *regs, expression *
         generate_number(emitter, expr->character->value, available_registers[base]);
         break;
     case t_func:
+        generate_function(emitter, regs, available_registers[base]);
         break;
     case t_print:
         printf("PRINT SHOULD NOT BE IN An EXPRESSIon");
@@ -592,6 +607,13 @@ uint16_t generate_expression(emitter_t *emitter, expression *expr, uint32_t stat
     expr_function **functions = malloc(sizeof(expr_function *) * 2);
     struct compile_expr compile_expr = {functions, 0, 2};
     comb_expression(expr, &compile_expr);
+
+    if (compile_expr.index > 0)
+    {
+        clean_up_blocks(emitter, block, reg);
+        create_function_stack(emitter, &compile_expr, reg);
+    }
+
     label_ershov_number(expr);
 
     create_function_stack(emitter, compile_expr, reg);
@@ -744,7 +766,6 @@ void compile_method(emitter_t *emitter, struct declare *declare)
 
             if (!block->unconditional_jump)
             {
-                printf("bol %d", block->is_while);
                 uint16_t register_index = generate_expression(emitter, block->jump_expression, 0, block, reg);
                 // think about more later
                 move_output_instruction(emitter, register_index, "rax");

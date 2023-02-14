@@ -33,10 +33,12 @@ void comb_expression(expression *e, struct compile_expr *comp)
     }
     case t_print:
     {
-        expr_function *expr = malloc(sizeof(expr_function));
-        expr->print = e->left;
-        e->func_number = comp->index;
-        add_expr_func(expr, comp);
+        printf("SHOULD NOT EXIST IN EXPRESSION");
+        // expr_function *expr = malloc(sizeof(expr_function));
+        // expr->print = e->left;
+        // e->func_number = comp->index;
+        // comb_expression(e->left, comp);
+        // add_expr_func(expr, comp);
         break;
     }
     case t_not:
