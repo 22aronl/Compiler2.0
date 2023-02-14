@@ -744,6 +744,7 @@ void compile_method(emitter_t *emitter, struct declare *declare)
 
             if (!block->unconditional_jump)
             {
+                print("bol %d", block->is_while);
                 uint16_t register_index = generate_expression(emitter, block->jump_expression, 0, block, reg);
                 // think about more later
                 move_output_instruction(emitter, register_index, "rax");
