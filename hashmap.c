@@ -60,7 +60,7 @@ void add_map_offset(struct map* map, Slice* key, int32_t value) {
         {
             if (slice_eq2(table->bins[i].key, key))
             {
-                table->bins[i].value = value;
+                //table->bins[i].value = value;
                 printf("Warning: overwriting value in map");
                 return;
             }

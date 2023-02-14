@@ -20,6 +20,19 @@ struct queue {
     struct queue* next;
 };
 
+struct queue_name {
+    Slice* name;
+    bool has_next;
+    struct queue_name* next;
+};
+
+struct queue_head {
+    struct queue_name* head;
+    struct queue_name* tail;
+};
+
+
+
 struct var_bin {
     int32_t* vars;
     uint32_t size;
@@ -59,11 +72,13 @@ typedef struct {
     Slice *name;
     Slice *parameters;
     uint16_t args;
+    struct map* map;
+    struct queue_head* queue_head;
 } method_t;
 
 method_t* parse_method(struct declare * declare);
 struct map* create_small_map();
-void create_next_use_information(block_t *block, struct map* map);
+void create_next_use_information(block_t *block, struct map* map, struct queue_head* queue);
 void live_variable_analysis(method_t *method);
 uint16_t generate_expression(emitter_t *emitter, expression *expr, uint32_t statement_index, block_t *block, registers_t *reg);
 
