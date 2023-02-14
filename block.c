@@ -206,7 +206,7 @@ method_t *parse_method(struct declare *declare)
         {
             add_to_in(blocks[blocks[i]->out_blocks[j]], i);
         }
-        create_next_use_information(blocks[i], map, &queue);
+        create_next_use_information(blocks[i], map, queue);
         blocks[i]->out_blocks_size_dag = blocks[i]->out_blocks_index;
         blocks[i]->out_blocks_dag = malloc(sizeof(bool) * blocks[i]->variables_index);
     }
@@ -646,7 +646,7 @@ void compile_method(emitter_t *emitter, struct declare *declare)
         free(queue->head);
         while(q_cur->has_next)
         {
-            declare_variable(emitter, q_cur->name);
+            declare_variable(emitter, q_cur->name, 0);
         }
     }
     free(queue);
