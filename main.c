@@ -273,7 +273,7 @@ expression *parse_value(Interpreter *in)
                 if (slice_eq(sl, "printf"))
                 {
                     free(sl);
-                    sl = slice_construct("printf2", 7);
+                    sl = slice_construct("printf_", 7);
                 }
                 struct func *func = malloc(sizeof(struct func));
 
@@ -536,7 +536,7 @@ statement *parse_statement(Interpreter *in, bool *continue_parsing)
         if (slice_eq(name, "printf"))
         {
             free(name);
-            name = slice_construct("printf2", 7);
+            name = slice_construct("printf_", 7);
         }
         consume_or_fail(in, "(");
         Slice *args = malloc(sizeof(Slice));
@@ -587,7 +587,7 @@ statement *parse_statement(Interpreter *in, bool *continue_parsing)
                 if (slice_eq(name, "printf"))
                 {
                     free(name);
-                    name = slice_construct("printf2", 7);
+                    name = slice_construct("printf_", 7);
                 }
                 expression **args = malloc(sizeof(expression *));
                 uint16_t args_size = 0;

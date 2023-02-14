@@ -161,35 +161,35 @@ void compile_statement(emitter_t *emitter, statement *s)
         pop_register(emitter, "rax");
         emit(emitter, "cmp $0, %rax");
         size_t if_number = emit_if_number(emitter);
-        emit_number(emitter, "je else%d", if_number);
+        emit_number(emitter, "je else%d_", if_number);
         for (uint32_t i = 0; i < s->internal->if_statement->size_body; i++)
             compile_statement(emitter, s->internal->if_statement->body[i]);
         if (s->internal->if_statement->has_else)
         {
-            emit_number(emitter, "jmp endif%d", if_number);
-            emit_number(emitter, "else%d:", if_number);
+            emit_number(emitter, "jmp endif%d_", if_number);
+            emit_number(emitter, "else%d_:", if_number);
             for (uint32_t i = 0; i < s->internal->if_statement->size_else; i++)
                 compile_statement(emitter, s->internal->if_statement->else_body[i]);
-            emit_number(emitter, "endif%d:", if_number);
+            emit_number(emitter, "endif%d_:", if_number);
         }
         else
         {
-            emit_number(emitter, "else%d:", if_number);
+            emit_number(emitter, "else%d_:", if_number);
         }
         break;
     }
     case s_while:
     {
         size_t while_number = emit_while_number(emitter);
-        emit_number(emitter, "while%d:", while_number);
+        emit_number(emitter, "while%d_:", while_number);
         compile_expression(emitter, s->internal->while_statement->condition);
         pop_register(emitter, "rax");
         emit(emitter, "cmp $0, %rax");
-        emit_number(emitter, "je endwhile%d", while_number);
+        emit_number(emitter, "je endwhile%d_", while_number);
         for (uint32_t i = 0; i < s->internal->while_statement->size_body; i++)
             compile_statement(emitter, s->internal->while_statement->body[i]);
-        emit_number(emitter, "jmp while%d", while_number);
-        emit_number(emitter, "endwhile%d:", while_number);
+        emit_number(emitter, "jmp while%d_", while_number);
+        emit_number(emitter, "endwhile%d_:", while_number);
         break;
     }
     case s_return:
