@@ -168,7 +168,7 @@ void compile_expression(emitter_t *emitter, expression *e)
         emit(emitter, "mov $0, %rax");
 
         bool change = align_stack(emitter);
-        emit(emitter, "lea format(%rip),%rdi");
+        emit(emitter, "lea format_(%rip),%rdi");
         emit(emitter, ".extern printf");
         emit(emitter, "call printf");
         emit(emitter, "mov $0, %rax");

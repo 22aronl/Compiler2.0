@@ -150,7 +150,7 @@ void compile_statement(emitter_t *emitter, statement *s)
         emit(emitter, "mov $0, %rax");
 
         bool change = align_stack(emitter);
-        emit(emitter, "lea format(%rip),%rdi");
+        emit(emitter, "lea format_(%rip),%rdi");
         emit(emitter, ".extern printf");
         emit(emitter, "call printf");
         realign_stack(emitter, change);

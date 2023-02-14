@@ -87,7 +87,7 @@ void push_variable(emitter_t *emitter, Slice *var, char *reg)
 void set_up_assembly(emitter_t *emitter)
 {
     emit(emitter, "    .data");
-    emit(emitter, "format: .byte '%', 'l', 'u', 10, 0");
+    emit(emitter, "format_: .byte '%', 'l', 'u', 10, 0");
     emit(emitter, "    .text");
     emit(emitter, "    .global main");
 }
