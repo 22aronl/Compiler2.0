@@ -138,6 +138,7 @@ block_t **parse_block(statement **body, uint32_t size_body, block_t **blocks, ui
                     }
 
                     add_to_out(blocks[current_block], current_block + 1);
+                    add_to_out(blocks[current_block], start_after_if);
                     add_to_out(blocks[if_end], start_after_if);
                 }
                 else if (s->type == s_while)
@@ -728,10 +729,7 @@ void compile_method(emitter_t *emitter, struct declare *declare)
             // think about more later
             move_output_instruction(emitter, register_index, "rax");
             emit(emitter, "cmp $0, %rax");
-            if (block->out_blocks_index > 1)
-                emit_number(emitter, "je label%d_", method->blocks[block->out_blocks[1]]->block_label);
-            else
-                emit_number(emitter, "je label%d_", method->blocks[block->out_blocks[1]]->block_label);
+            emit_number(emitter, "je label%d_", method->blocks[block->out_blocks[1]]->block_label);
         }
 
         clean_up_block(reg);
