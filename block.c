@@ -189,14 +189,12 @@ method_t *parse_method(struct declare *declare)
     blocks[0]->out_blocks_size = 2;
     blocks[0]->unconditional_jump = true;
 
-
-
     parse_block(declare->body, declare->size_body, blocks, &block_index, &block_size, exit_block);
-    struct queue_name* qhead = malloc(sizeof(struct queue_name));
+    struct queue_name *qhead = malloc(sizeof(struct queue_name));
     qhead->next = NULL;
     qhead->name = NULL;
     qhead->has_next = false;
-    struct queue_head* queue = malloc(sizeof(struct queue_head));
+    struct queue_head *queue = malloc(sizeof(struct queue_head));
     queue->head = qhead;
     queue->tail = qhead;
 
@@ -256,13 +254,13 @@ void add_to_variables(block_t *block, int32_t input, int32_t hash)
     block->variables[hash]->vars[block->variables[hash]->index++] = input;
 }
 
-void queue_add(struct queue_head* queue, struct queue_name* queue_name)
+void queue_add(struct queue_head *queue, struct queue_name *queue_name)
 {
     queue->tail->next = queue_name;
     queue->tail->has_next = true;
     queue->tail = queue_name;
 }
-void add_to_next_use(block_t *block, Slice *name, int32_t state_index, struct queue_head* queue)
+void add_to_next_use(block_t *block, Slice *name, int32_t state_index, struct queue_head *queue)
 {
     int32_t index = get_map_offset2(block->variable_map, name);
     if (index == -1)
@@ -270,23 +268,23 @@ void add_to_next_use(block_t *block, Slice *name, int32_t state_index, struct qu
         index = block->variables_index++;
         add_map_offset(block->variable_map, name, index);
 
-        struct queue_name* queue_name = malloc(sizeof(struct queue_name));
+        struct queue_name *queue_name = malloc(sizeof(struct queue_name));
         queue_name->name = name;
         queue_name->has_next = false;
-        
+
         queue_add(queue, queue_name);
     }
     add_to_variables(block, state_index, index);
 }
 
-void next_use_expression(expression *expr, block_t *block, int32_t state_index, struct queue_head* queue)
+void next_use_expression(expression *expr, block_t *block, int32_t state_index, struct queue_head *queue)
 {
     switch (expr->type)
     {
     case t_var:
         add_to_next_use(block, expr->character->name, state_index, queue);
         break;
-    case t_func: //TODO: why function here
+    case t_func: // TODO: why function here
         for (uint32_t i = 0; i < expr->character->function->args; i++)
         {
             next_use_expression(expr->character->function->parameters[i], block, state_index, queue);
@@ -307,7 +305,7 @@ void next_use_expression(expression *expr, block_t *block, int32_t state_index, 
     }
 }
 
-void next_use_statement(statement *state, block_t *block, int32_t state_index, struct queue_head* queue)
+void next_use_statement(statement *state, block_t *block, int32_t state_index, struct queue_head *queue)
 {
     switch (state->type)
     {
@@ -333,7 +331,7 @@ void next_use_statement(statement *state, block_t *block, int32_t state_index, s
     }
 }
 
-void create_next_use_information(block_t *block, struct map *map, struct queue_head* queue)
+void create_next_use_information(block_t *block, struct map *map, struct queue_head *queue)
 {
     block->variable_map = map;
     block->variables = malloc(sizeof(struct var_bin *) * 2);
@@ -589,7 +587,7 @@ uint16_t generate_expression(emitter_t *emitter, expression *expr, uint32_t stat
     if (expr->ershov_number > available_registers_size) // Index bounding, need to check
     {
         compile_uneven_expression_tree(emitter, reg, expr, block, available_registers, available_registers_size);
-        output_register = available_registers[available_registers_size - 1]; //Might be minus 2?
+        output_register = available_registers[available_registers_size - 1]; // Might be minus 2?
     }
     else
     {
@@ -639,14 +637,18 @@ void compile_method(emitter_t *emitter, struct declare *declare)
     }
 
     // Declare my variables
-    struct queue_head* queue = method->queue_head;
-    if(queue->head->has_next)
+    struct queue_head *queue = method->queue_head;
+    if (queue->head->has_next)
     {
-        struct queue_name* q_cur = queue->head->next;
+        struct queue_name *q_cur = queue->head->next;
         free(queue->head);
-        while(q_cur->has_next)
+        while (q_cur->has_next)
         {
-            declare_variable(emitter, q_cur->name, 0);
+            int32_t offset = get_map_offset(emitter->var_map, q_cur->name);
+            if (offset == 0)
+            {
+                declare_variable(emitter, q_cur->name, -(emitter->var_offset++) * 8);
+            }
         }
     }
     free(queue);
