@@ -64,9 +64,9 @@ void add_to_in(block_t *block, uint32_t index)
     block->in_blocks[block->in_blocks_index++] = index;
 }
 
-void parse_block(statement **body, uint32_t size_body, block_t **block_array, uint32_t *block_index, uint32_t *block_size, block_t *exit_block)
+void parse_block(statement **body, uint32_t size_body, block_t ***block_array, uint32_t *block_index, uint32_t *block_size, block_t *exit_block)
 {
-    block_t **blocks = block_array;
+    block_t **blocks = *block_array;
 
     statement **cur_statements = malloc(sizeof(statement *) * 2);
     uint32_t cur_statement_size = 2;
@@ -97,7 +97,7 @@ void parse_block(statement **body, uint32_t size_body, block_t **block_array, ui
                 cur_statements[cur_statement_index++] = s;
             }
 
-            add_new_block(&blocks, block_index, block_size, cur_statements, &cur_statement_index, &cur_statement_size);
+            add_new_block(block_array, block_index, block_size, cur_statements, &cur_statement_index, &cur_statement_size);
             cur_statements = malloc(sizeof(statement *) * 2);
             cur_statement_size = 2;
             cur_statement_index = 0;
@@ -112,7 +112,7 @@ void parse_block(statement **body, uint32_t size_body, block_t **block_array, ui
                 {
                     // EVALUATE THE PARAMETERS
                     cur_statements[cur_statement_index++] = s;
-                    add_new_block(&blocks, block_index, block_size, cur_statements, &cur_statement_index, &cur_statement_size);
+                    add_new_block(block_array, block_index, block_size, cur_statements, &cur_statement_index, &cur_statement_size);
                     cur_statements = malloc(sizeof(statement *) * 2);
                     cur_statement_size = 2;
                     cur_statement_index = 0;
@@ -124,13 +124,13 @@ void parse_block(statement **body, uint32_t size_body, block_t **block_array, ui
                     blocks[current_block]->unconditional_jump = false;
                     blocks[current_block]->jump_expression = s->internal->if_statement->condition;
 
-                    parse_block(s->internal->if_statement->body, s->internal->if_statement->size_body, blocks, block_index, block_size, exit_block);
+                    parse_block(s->internal->if_statement->body, s->internal->if_statement->size_body, &blocks, block_index, block_size, exit_block);
                     uint32_t if_end = *block_index - 1;
                     uint32_t start_after_if = *block_index;
 
                     if (s->internal->if_statement->has_else)
                     {
-                        parse_block(s->internal->if_statement->else_body, s->internal->if_statement->size_else, blocks, block_index, block_size, exit_block);
+                        parse_block(s->internal->if_statement->else_body, s->internal->if_statement->size_else, &blocks, block_index, block_size, exit_block);
                         uint32_t else_end = *block_index - 1;
 
                         add_to_out(blocks[current_block], start_after_if);
@@ -149,7 +149,7 @@ void parse_block(statement **body, uint32_t size_body, block_t **block_array, ui
                     blocks[current_block]->unconditional_jump = false;
                     blocks[current_block]->jump_expression = s->internal->while_statement->condition;
 
-                    parse_block(s->internal->while_statement->body, s->internal->while_statement->size_body, blocks, block_index, block_size, exit_block);
+                    parse_block(s->internal->while_statement->body, s->internal->while_statement->size_body, &blocks, block_index, block_size, exit_block);
                     uint32_t while_end = *block_index - 1;
                     uint32_t start_after_while = *block_index;
 
@@ -163,7 +163,7 @@ void parse_block(statement **body, uint32_t size_body, block_t **block_array, ui
 
     if (cur_statement_index > 0)
     {
-        add_new_block(&blocks, block_index, block_size, cur_statements, &cur_statement_index, &cur_statement_size);
+        add_new_block(block_array, block_index, block_size, cur_statements, &cur_statement_index, &cur_statement_size);
     }
 }
 
@@ -189,7 +189,7 @@ method_t *parse_method(struct declare *declare)
     blocks[0]->out_blocks_size = 2;
     blocks[0]->unconditional_jump = true;
 
-    parse_block(declare->body, declare->size_body, blocks, &block_index, &block_size, exit_block);
+    parse_block(declare->body, declare->size_body, &blocks, &block_index, &block_size, exit_block);
     struct queue_name *qhead = malloc(sizeof(struct queue_name));
     qhead->next = NULL;
     qhead->name = NULL;
