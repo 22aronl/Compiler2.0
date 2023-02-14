@@ -157,8 +157,8 @@ block_t **parse_block(statement **body, uint32_t size_body, block_t **blocks, ui
                     uint32_t while_end = *block_index - 1;
                     uint32_t start_after_while = *block_index;
 
-                    add_to_out(blocks[current_block], current_block + 1);
                     add_to_out(blocks[current_block], start_after_while);
+                    add_to_out(blocks[current_block], current_block + 1);
                     add_to_out(blocks[while_end], current_block + 1);
                 }
             }
