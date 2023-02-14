@@ -86,3 +86,5 @@ void live_variable_analysis(method_t *method);
 uint16_t generate_expression(emitter_t *emitter, expression *expr, uint32_t statement_index, block_t *block, registers_t *reg);
 
 void compile_method(emitter_t *emitter, struct declare *declare);
+
+void function_call_statement(emitter_t *emitter, struct func* func, registers_t *regs, block_t *block, uint32_t statement_index);

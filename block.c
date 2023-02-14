@@ -450,16 +450,12 @@ void unstore_instruction(emitter_t *emitter, uint16_t reg)
     pop_register(emitter, emitter->registers[reg]);
 }
 
-void function_call_instruction(emitter_t* emitter, struct function* func, registers_t* regs)
-{
-    //TODO: ADD support
-}
 
 void create_function_stack(emitter_t *emitter, struct compile_expr *com_expr, registers_t *regs)
 {
     for (uint16_t i = 0; i < com_expr->index; i++)
     {
-        function_call_instruction(emitter, com_expr->functions[i]->function, regs);
+        function_call_statement(emitter, com_expr->function[i]->function, regs, NULL, 0);
         push_register(emitter, "rax");
     }
 }
@@ -474,9 +470,9 @@ void move_output_instruction(emitter_t *emitter, uint16_t src, char *dest)
     emit_reg_to_reg(emitter, "movq %%%s, %%%s", emitter->registers[src], dest);
 }
 
-void generate_function(emitter_t * emitter, registers_t*regs, uint16_t base)
+void generate_function(emitter_t *emitter, registers_t *regs, uint16_t base)
 {
-    //TODO: add support
+    // TODO: add support
 }
 
 void generate_variable(emitter_t *emitter, registers_t *regs, Slice *name, uint16_t base)
@@ -610,13 +606,13 @@ uint16_t generate_expression(emitter_t *emitter, expression *expr, uint32_t stat
 
     if (compile_expr.index > 0)
     {
-        clean_up_blocks(emitter, block, reg);
+        clean_up_block(reg);
         create_function_stack(emitter, &compile_expr, reg);
     }
 
     label_ershov_number(expr);
 
-    create_function_stack(emitter, compile_expr, reg);
+    create_function_stack(emitter, &compile_expr, reg);
 
     uint16_t available_registers_size = available_registers(reg, statement_index);
     uint16_t *available_registers = malloc(sizeof(uint16_t) * available_registers_size);
@@ -647,8 +643,20 @@ void return_function_statement(emitter_t *emitter)
     emit(emitter, "retq");
 }
 
-void function_call_statement(emitter_t *emitter, statement *statement, registers_t *regs, block_t *block, uint32_t statement_index)
+void print_instruction(emitter_t *emitter, uint16_t register_index, registers_t* reg)
 {
+    //TODO: IMplement
+}
+
+void function_call_statement(emitter_t *emitter, struct func* func, registers_t *regs, block_t *block, uint32_t statement_index)
+{
+    for(int i = 0; i < func->args; i++)
+    {
+        uint16_t register_index = generate_expression(emitter, func->parameters[i], statement_index, block, regs);
+        push_register(emitter, emitter->registers[register_index]);
+    }
+    clean_up_block(regs);
+    emit_name(emitter, "call %.*s\n", func->name);
 }
 
 void compile_statement_in_block(emitter_t *emitter, statement *stmt, registers_t *regs, block_t *block, uint32_t statement_index)
@@ -669,9 +677,17 @@ void compile_statement_in_block(emitter_t *emitter, statement *stmt, registers_t
         break;
     }
     case s_func:
+    {
+        function_call_statement(emitter, stmt->internal->func, regs, block, statement_index);
         break;
+    }
     case s_print:
+    {
+        uint16_t register_index = generate_expression(emitter, stmt->internal->print->expr, statement_index, block, regs);
+        print_instruction(emitter, register_index, regs);
+
         break;
+    }
     case s_if: // code statements of s_if and s_while won't exist in the code
         break;
     case s_while: // uneeded
