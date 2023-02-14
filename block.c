@@ -247,7 +247,7 @@ void add_to_variables(block_t *block, int32_t input, int32_t hash)
         block->variables = realloc(block->variables, sizeof(struct var_bin *) * block->variables_size);
     }
     // Check if the struct is created in the block
-    if (block->variables[hash] == NULL)
+    if (block->variables[hash] == NULL || block->variables[hash]->vars == NULL)
     {
         block->variables[hash] = malloc(sizeof(struct var_bin));
         block->variables[hash]->vars = malloc(sizeof(int32_t) * 2);
