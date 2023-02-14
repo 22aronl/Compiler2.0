@@ -26,7 +26,7 @@ void compile_expression(emitter_t *emitter, expression *e)
         compile_expression(emitter, e->right);
         pop_register(emitter, "rax");
         pop_register(emitter, "rbx");
-        emit(emitter, "imul \%rbx, \%rax");
+        emit(emitter, "mul \%rbx, \%rax");
         push_register(emitter, "rax");
         break;
     case t_divide:
@@ -35,7 +35,7 @@ void compile_expression(emitter_t *emitter, expression *e)
         pop_register(emitter, "rbx");
         pop_register(emitter, "rax");
         emit(emitter, "movq $0, %rdx");
-        emit(emitter, "idiv \%rbx");
+        emit(emitter, "div \%rbx");
         push_register(emitter, "rax");
         break;
     case t_mod:
@@ -44,7 +44,7 @@ void compile_expression(emitter_t *emitter, expression *e)
         pop_register(emitter, "rbx");
         pop_register(emitter, "rax");
         emit(emitter, "movq $0, %rdx");
-        emit(emitter, "idiv \%rbx");
+        emit(emitter, "div \%rbx");
         push_register(emitter, "rdx");
         break;
     case t_plus:
