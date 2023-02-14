@@ -128,7 +128,12 @@ void compile_expression(emitter_t *emitter, expression *e)
         compile_expression(emitter, e->right);
         pop_register(emitter, "rax");
         pop_register(emitter, "rbx");
-        emit(emitter, "and \%rbx, \%rax");
+        emit(emitter, "cmp $0, \%rax");
+        emit(emitter, "setg \%al");
+        emit(emitter, "cmp $0, \%rbx");
+        emit(emitter, "setg \%bl");
+        emit(emitter, "and \%bl, \%al");
+        emit(emitter, "movzbq \%al, \%rax");
         push_register(emitter, "rax");
         break;
     case t_or:
