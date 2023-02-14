@@ -86,7 +86,6 @@ void parse_block(statement **body, uint32_t size_body, block_t **block_array, ui
         }
         else
         {
-
             if (s->type == s_return)
             {
                 if (cur_statement_index == cur_statement_size)
@@ -305,6 +304,8 @@ void next_use_expression(expression *expr, block_t *block, int32_t state_index, 
     }
 }
 
+
+
 void next_use_statement(statement *state, block_t *block, int32_t state_index, struct queue_head *queue)
 {
     switch (state->type)
@@ -449,6 +450,11 @@ void move_instruction(emitter_t *emitter, uint16_t src, uint16_t dest)
     emit_reg_to_reg(emitter, "movq %%%s, %%%s", emitter->registers[src], emitter->registers[dest]);
 }
 
+void move_output_instruction(emitter_t* emitter, uint16_t src)
+{
+    emit_reg_to_reg(emitter, "movq %%%s, %%%s", emitter->registers[src], "rax");
+}
+
 void generate_variable(emitter_t *emitter, registers_t *regs, Slice *name, uint16_t base)
 {
     int32_t reg = is_in_register(regs, name);
@@ -458,6 +464,7 @@ void generate_variable(emitter_t *emitter, registers_t *regs, Slice *name, uint1
     }
     else
     {
+        //TODO: Check that the variable doesn't need to moved and change it
         move_instruction(emitter, reg, base);
     }
 }
@@ -499,6 +506,7 @@ void compile_expression_tree(emitter_t *emitter, registers_t *regs, expression *
     case t_func:
         break;
     case t_print:
+        printf("PRINT SHOULD NOT BE IN An EXPRESSIon");
         break;
     case t_not:
         compile_expression_tree(emitter, regs, expr->left, block, base, available_registers);
@@ -598,6 +606,11 @@ uint16_t generate_expression(emitter_t *emitter, expression *expr, uint32_t stat
     return output_register;
 }
 
+void function_call_statement(emitter_t* emitter, statement* statement, registers_t* regs, block_t* block, uint32_t statement_index)
+{
+
+}
+
 void compile_statement_in_block(emitter_t *emitter, statement *stmt, registers_t *regs, block_t *block, uint32_t statement_index)
 {
     switch (stmt->type)
@@ -608,6 +621,20 @@ void compile_statement_in_block(emitter_t *emitter, statement *stmt, registers_t
         set_reg(regs, stmt->internal->var->name, register_index);
         break;
     }
+    case s_return:
+    {
+        uint16_t register_index = generate_expression(emitter, stmt->internal->return_statement->expr, statement_index, block, regs);
+        move_output_instruction(emitter, register_index);
+        break;
+    }
+    case s_func:
+        break;
+    case s_print:
+        break;
+    case s_if:
+        break;
+    case s_while:
+        break;
     default:
     {
         printf("YA DONE GOOFED");
