@@ -643,7 +643,7 @@ void compile_method(emitter_t *emitter, struct declare *declare)
     {
         struct queue_name *q_cur = queue->head->next;
         free(queue->head);
-        while (q_cur->has_next)
+        while (true)
         {
             int32_t offset = get_map_offset(emitter->var_map, q_cur->name);
             if (offset == 0)
@@ -651,7 +651,14 @@ void compile_method(emitter_t *emitter, struct declare *declare)
                 declare_variable(emitter, q_cur->name, -(emitter->var_offset++) * 8);
                 counter++;
             }
-            struct queue_name* q_current = q_cur;
+
+            if (!q_cur->has_next)
+            {
+                free(q_cur);
+                break;
+            }
+
+            struct queue_name *q_current = q_cur;
             q_cur = q_current->next;
             free(q_current);
         }
@@ -662,7 +669,7 @@ void compile_method(emitter_t *emitter, struct declare *declare)
     }
     free(queue);
 
-    if(counter > 0)
+    if (counter > 0)
         shift_stack(emitter, counter);
 
     for (uint32_t i = 0; i < method->block_size; i++)
