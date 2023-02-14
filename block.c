@@ -478,7 +478,7 @@ void move_output_instruction(emitter_t *emitter, uint16_t src, char *dest)
 
 void generate_function(emitter_t *emitter, registers_t *regs, uint16_t base)
 {
-    pop_variable_to_reg(emitter, 8 * regs->functions_counter++, emitter->registers[base]);
+    pop_variable_to_reg(emitter, regs->functions_stack + 8 * regs->functions_counter++, emitter->registers[base]);
 }
 
 void generate_variable(emitter_t *emitter, registers_t *regs, Slice *name, uint16_t base)
