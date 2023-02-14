@@ -248,7 +248,7 @@ void add_to_variables(block_t *block, int32_t input, int32_t hash)
 void add_to_next_use(block_t *block, Slice *name, int32_t state_index)
 {
     int32_t index = get_map_offset(block->variable_map, name);
-    if (index == 0)
+    if (index == -1)
     {
         index = block->variables_index++;
         add_map_offset(block->variable_map, name, index);
@@ -263,7 +263,7 @@ void next_use_expression(expression *expr, block_t *block, int32_t state_index)
     case t_var:
         add_to_next_use(block, expr->character->name, state_index);
         break;
-    case t_func:
+    case t_func: //TODO: why function here
         for (uint32_t i = 0; i < expr->character->function->args; i++)
         {
             next_use_expression(expr->character->function->parameters[i], block, state_index);

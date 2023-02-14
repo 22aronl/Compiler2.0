@@ -7,6 +7,7 @@
 #include "main.h"
 #include "statement.h"
 
+
 int32_t get_map_offset(struct map* map, Slice* key) {
     bool* visited = map->visited;
     hash_map* symbol_table = map->map;
@@ -23,7 +24,7 @@ int32_t get_map_offset(struct map* map, Slice* key) {
             }
         }
     }
-    return 0;
+    return -1;
 }
 
 void add_map_offset(struct map* map, Slice* key, int32_t value) {
@@ -42,6 +43,7 @@ void add_map_offset(struct map* map, Slice* key, int32_t value) {
             if (slice_eq2(table->bins[i].key, key))
             {
                 table->bins[i].value = value;
+                printf("Warning: overwriting value in map");
                 return;
             }
         }
