@@ -50,7 +50,7 @@ typedef struct {
     uint32_t* in_blocks;
     uint32_t in_blocks_index;
     uint32_t in_blocks_size;
-    //If conditional expression is true, go to index 0, else jump to index 1
+    //If conditional expression is false, jump to index 0
     uint32_t* out_blocks;
     uint32_t out_blocks_index;
     uint32_t out_blocks_size;
