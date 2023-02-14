@@ -129,9 +129,9 @@ void compile_expression(emitter_t *emitter, expression *e)
         pop_register(emitter, "rax");
         pop_register(emitter, "rbx");
         emit(emitter, "cmp $0, \%rax");
-        emit(emitter, "setg \%al");
+        emit(emitter, "seta \%al");
         emit(emitter, "cmp $0, \%rbx");
-        emit(emitter, "setg \%bl");
+        emit(emitter, "seta \%bl");
         emit(emitter, "and \%bl, \%al");
         emit(emitter, "movzbq \%al, \%rax");
         push_register(emitter, "rax");
@@ -142,9 +142,9 @@ void compile_expression(emitter_t *emitter, expression *e)
         pop_register(emitter, "rax");
         pop_register(emitter, "rbx");
         emit(emitter, "cmp $0, \%rax");
-        emit(emitter, "setg \%al");
+        emit(emitter, "seta \%al");
         emit(emitter, "cmp $0, \%rbx");
-        emit(emitter, "setg \%bl");
+        emit(emitter, "seta \%bl");
         emit(emitter, "or \%bl, \%al");
         emit(emitter, "movzbq \%al, \%rax");
         push_register(emitter, "rax");
