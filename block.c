@@ -132,14 +132,19 @@ block_t **parse_block(statement **body, uint32_t size_body, block_t **blocks, ui
                         uint32_t else_end = *block_index - 1;
 
                         add_to_out(blocks[current_block], start_after_if);
+                        blocks[if_end]->has_jump = true;
+                        blocks[if_end]->unconditional_jump = true;
                         add_to_out(blocks[if_end], else_end + 1);
                         start_after_if = *block_index;
                         add_to_out(blocks[else_end], start_after_if);
                     }
+                    else
+                    {
+                        add_to_out(blocks[current_block], start_after_if);
+                        add_to_out(blocks[if_end], start_after_if);
+                    }
 
                     add_to_out(blocks[current_block], current_block + 1);
-                    add_to_out(blocks[current_block], start_after_if);
-                    add_to_out(blocks[if_end], start_after_if);
                 }
                 else if (s->type == s_while)
                 { // I think this needs to be reworked
@@ -725,11 +730,18 @@ void compile_method(emitter_t *emitter, struct declare *declare)
 
         if (block->has_jump)
         {
-            uint16_t register_index = generate_expression(emitter, block->jump_expression, 0, block, reg);
-            // think about more later
-            move_output_instruction(emitter, register_index, "rax");
-            emit(emitter, "cmp $0, %rax");
-            emit_number(emitter, "je label%d_", method->blocks[block->out_blocks[1]]->block_label);
+            if (!block->unconditional_jump)
+            {
+                uint16_t register_index = generate_expression(emitter, block->jump_expression, 0, block, reg);
+                // think about more later
+                move_output_instruction(emitter, register_index, "rax");
+                emit(emitter, "cmp $0, %rax");
+                emit_number(emitter, "je label%d_", method->blocks[block->out_blocks[1]]->block_label);
+            }
+            else
+            {
+                emit_number(emitter, "jmp label%d_", method->blocks[block->out_blocks[0]]->block_label);
+            }
         }
 
         clean_up_block(reg);
