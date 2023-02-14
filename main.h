@@ -34,9 +34,9 @@ typedef struct
     size_t stack_pointer;
     size_t if_count;
     size_t while_count;
+    uint32_t label_count;
     uint16_t var_offset;
-
-    char **registers;
+    char ** registers;
 } emitter_t;
 
 typedef struct

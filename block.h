@@ -63,6 +63,7 @@ typedef struct {
     bool* in_blocks_dag;
     bool* out_blocks_dag;
     bool* defined_in_block;
+    uint32_t block_label;
 } block_t;
 
 

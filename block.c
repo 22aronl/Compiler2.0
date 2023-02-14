@@ -142,7 +142,7 @@ void parse_block(statement **body, uint32_t size_body, block_t **block_array, ui
                     add_to_out(blocks[if_end], start_after_if);
                 }
                 else if (s->type == s_while)
-                {
+                { // I think this needs to be reworked
                     uint32_t current_block = *block_index - 1;
                     blocks[current_block]->has_jump = true;
                     blocks[current_block]->unconditional_jump = false;
@@ -259,6 +259,7 @@ void queue_add(struct queue_head *queue, struct queue_name *queue_name)
     queue->tail->has_next = true;
     queue->tail = queue_name;
 }
+
 void add_to_next_use(block_t *block, Slice *name, int32_t state_index, struct queue_head *queue)
 {
     int32_t index = get_map_offset2(block->variable_map, name);
@@ -448,9 +449,9 @@ void move_instruction(emitter_t *emitter, uint16_t src, uint16_t dest)
     emit_reg_to_reg(emitter, "movq %%%s, %%%s", emitter->registers[src], emitter->registers[dest]);
 }
 
-void move_output_instruction(emitter_t *emitter, uint16_t src)
+void move_output_instruction(emitter_t *emitter, uint16_t src, char *dest)
 {
-    emit_reg_to_reg(emitter, "movq %%%s, %%%s", emitter->registers[src], "rax");
+    emit_reg_to_reg(emitter, "movq %%%s, %%%s", emitter->registers[src], dest);
 }
 
 void generate_variable(emitter_t *emitter, registers_t *regs, Slice *name, uint16_t base)
@@ -630,7 +631,7 @@ void compile_statement_in_block(emitter_t *emitter, statement *stmt, registers_t
     case s_return:
     {
         uint16_t register_index = generate_expression(emitter, stmt->internal->return_statement->expr, statement_index, block, regs);
-        move_output_instruction(emitter, register_index);
+        move_output_instruction(emitter, register_index, "rax");
         return_function_statement(emitter);
         break;
     }
@@ -638,9 +639,9 @@ void compile_statement_in_block(emitter_t *emitter, statement *stmt, registers_t
         break;
     case s_print:
         break;
-    case s_if:
+    case s_if: // code statements of s_if and s_while won't exist in the code
         break;
-    case s_while:
+    case s_while: // uneeded
         break;
     default:
     {
@@ -707,6 +708,9 @@ void compile_method(emitter_t *emitter, struct declare *declare)
         shift_stack(emitter, counter);
 
     for (uint32_t i = 0; i < method->block_size; i++)
+        method->blocks[i]->block_label = create_label(emitter);
+
+    for (uint32_t i = 0; i < method->block_size; i++)
     {
         block_t *block = method->blocks[i];
         registers_t *reg = declare_register(block, new_map, emitter);
@@ -716,6 +720,19 @@ void compile_method(emitter_t *emitter, struct declare *declare)
             statement *stmt = block->statements[j];
             compile_statement_in_block(emitter, stmt, reg, block, j);
         }
+
+        if (block->has_jump)
+        {
+            uint16_t register_index = generate_expression(emitter, block->jump_expression, 0, block, reg);
+            // think about more later
+            move_output_instruction(emitter, register_index, "rax");
+            emit(emitter, "cmp $0, %rax");
+            if (block->out_blocks_index > 1)
+                emit_number(emitter, "je label%d_", method->blocks[block->out_blocks[1]]->block_label);
+            else
+                emit_number(emitter, "je label%d_", method->blocks[block->out_blocks[0]]->block_label);
+        }
+
         clean_up_block(reg);
         free(reg);
     }

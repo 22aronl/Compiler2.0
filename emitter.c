@@ -3,6 +3,11 @@
 
 #include "emitter.h"
 
+uint32_t create_label(emitter_t *emitter)
+{
+    return emitter->label_count++;
+}
+
 void sub_rsp(emitter_t *emitter, int16_t offset)
 {
     emitter->stack_pointer += offset * 8;
@@ -102,8 +107,6 @@ void emit_fix_stack(emitter_t* emitter)
 {
     if(emitter->stack_pointer != 8)
     {
-        printf("%ld", emitter->stack_pointer);
-        printf("%d", -emitter->stack_pointer / 8 + 1);
         shift_stack(emitter, -emitter->stack_pointer / 8 + 2);
     }
 }
@@ -182,6 +185,7 @@ emitter_t* create_emitter() {
     em->if_count = 0;
     em->while_count = 0;
     em->stack_pointer = 0;
+    em->label_count = 0;
     em->registers = malloc(sizeof(char*) * 13);
     em->registers[0] = "r15";
     em->registers[1] = "r14";
