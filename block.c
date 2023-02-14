@@ -631,6 +631,7 @@ void compile_statement_in_block(emitter_t *emitter, statement *stmt, registers_t
     {
         uint16_t register_index = generate_expression(emitter, stmt->internal->return_statement->expr, statement_index, block, regs);
         move_output_instruction(emitter, register_index);
+        return_function_statement(emitter);
         break;
     }
     case s_func:
