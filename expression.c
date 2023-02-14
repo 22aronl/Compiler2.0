@@ -26,7 +26,6 @@ void compile_expression(emitter_t *emitter, expression *e)
         compile_expression(emitter, e->right);
         pop_register(emitter, "rax");
         pop_register(emitter, "rbx");
-        emit(emitter, "movq $0, %rdx");
         emit(emitter, "mul \%rbx");
         push_register(emitter, "rax");
         break;
@@ -70,7 +69,7 @@ void compile_expression(emitter_t *emitter, expression *e)
         pop_register(emitter, "rbx");
         pop_register(emitter, "rax");
         emit(emitter, "cmp \%rbx, \%rax");
-        emit(emitter, "setl \%al");
+        emit(emitter, "setb \%al");
         emit(emitter, "movzbq \%al, \%rax");
         push_register(emitter, "rax");
         break;
@@ -80,7 +79,7 @@ void compile_expression(emitter_t *emitter, expression *e)
         pop_register(emitter, "rbx");
         pop_register(emitter, "rax");
         emit(emitter, "cmp \%rbx, \%rax");
-        emit(emitter, "setg \%al");
+        emit(emitter, "seta \%al");
         emit(emitter, "movzbq \%al, \%rax");
         push_register(emitter, "rax");
         break;
@@ -90,7 +89,7 @@ void compile_expression(emitter_t *emitter, expression *e)
         pop_register(emitter, "rbx");
         pop_register(emitter, "rax");
         emit(emitter, "cmp \%rbx, \%rax");
-        emit(emitter, "setle \%al");
+        emit(emitter, "setbe \%al");
         emit(emitter, "movzbq \%al, \%rax");
         push_register(emitter, "rax");
         break;
@@ -100,7 +99,7 @@ void compile_expression(emitter_t *emitter, expression *e)
         pop_register(emitter, "rbx");
         pop_register(emitter, "rax");
         emit(emitter, "cmp \%rbx, \%rax");
-        emit(emitter, "setge \%al");
+        emit(emitter, "setae \%al");
         emit(emitter, "movzbq \%al, \%rax");
         push_register(emitter, "rax");
         break;
