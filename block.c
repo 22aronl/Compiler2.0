@@ -478,6 +478,8 @@ void move_output_instruction(emitter_t *emitter, uint16_t src, char *dest)
 
 void generate_function(emitter_t *emitter, registers_t *regs, uint16_t base)
 {
+    printf("REGS: %lu", regs->functions_stack);
+    printf("HI: %lu", regs->functions_counter);
     pop_variable_to_reg(emitter, regs->functions_stack + 8 * regs->functions_counter++, emitter->registers[base]);
 }
 
