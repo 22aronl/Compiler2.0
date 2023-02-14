@@ -102,7 +102,8 @@ void emit_fix_stack(emitter_t* emitter)
 {
     if(emitter->stack_pointer != 8)
     {
-        shift_stack(emitter, - emitter->stack_pointer / 8 + 1);
+        printf("%d", -emitter->stack_pointer / 8 + 1);
+        shift_stack(emitter, -emitter->stack_pointer / 8 + 1);
     }
 }
 
