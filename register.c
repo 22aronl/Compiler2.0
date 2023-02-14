@@ -58,6 +58,7 @@ void clean_up_block(registers_t *reg)
         if (reg->registers[i] != -1)
         // if (reg->registers[i] != -1 && reg->out_blocks_dag[reg->registers[i]])
         {
+            printf("%d%d", i, reg->registers[i]);
             return_register_to_memory(reg, reg->registers[i]);
             reg->registers[i] = -1;
         }
