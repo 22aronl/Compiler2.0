@@ -1,4 +1,10 @@
+fun add(x) 
+{
+    return x + 1
+}
+
 fun main() {
     x = 1
-    print(x)
+    y = add(x)
+    print(y)
 }
