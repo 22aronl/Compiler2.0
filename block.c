@@ -39,6 +39,7 @@ block_t **add_new_block(block_t **blocks, uint32_t *block_index, uint32_t *block
     blocks[*block_index]->in_blocks_size = 2;
     blocks[*block_index]->is_while = false;
 
+
     (*block_index)++;
 
     return blocks;
@@ -185,6 +186,8 @@ method_t *parse_method(struct declare *declare)
     exit_block->in_blocks = malloc(sizeof(uint32_t) * 2);
     exit_block->in_blocks_index = 0;
     exit_block->in_blocks_size = 2;
+    exit_block->statement_size = 0;
+    exit_block->has_jump = false;
 
     block_t **blocks = malloc(sizeof(block_t *) * 2);
     uint32_t block_size = 2;
@@ -198,6 +201,8 @@ method_t *parse_method(struct declare *declare)
     blocks[0]->out_blocks_index = 0;
     blocks[0]->out_blocks_size = 2;
     blocks[0]->unconditional_jump = true;
+    blocks[0]->has_jump = true;
+    blocks[0]->statement_size = 0;
 
     blocks = parse_block(declare->body, declare->size_body, blocks, &block_index, &block_size, exit_block);
     struct queue_name *qhead = malloc(sizeof(struct queue_name));
