@@ -1,10 +1,12 @@
 
+fun test() {
+    return 1
+}
+
 fun main() {
     x = 1
     y = 1
     z = 0
-    while(x == y) {
-        z = z + 1
-    }
+    z = x + test()
     return z
 }
