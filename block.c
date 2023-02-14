@@ -718,8 +718,10 @@ void compile_statement_in_block(emitter_t *emitter, statement *stmt, registers_t
         break;
     case s_while: // uneeded
         break;
-    default:
+    case s_declare:
     {
+        //print stmt->type
+        
         printf("YA DONE GOOFED");
         break;
     }
