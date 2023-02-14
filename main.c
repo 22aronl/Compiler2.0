@@ -686,7 +686,7 @@ void run_optimize(Interpreter* in)
         {
             break;
         }
-        compile_method(em, state);
+        compile_method(em, state->internal->declare);
         add_statement(in, state);
     }
 
