@@ -304,8 +304,6 @@ void next_use_expression(expression *expr, block_t *block, int32_t state_index, 
     }
 }
 
-
-
 void next_use_statement(statement *state, block_t *block, int32_t state_index, struct queue_head *queue)
 {
     switch (state->type)
@@ -450,7 +448,7 @@ void move_instruction(emitter_t *emitter, uint16_t src, uint16_t dest)
     emit_reg_to_reg(emitter, "movq %%%s, %%%s", emitter->registers[src], emitter->registers[dest]);
 }
 
-void move_output_instruction(emitter_t* emitter, uint16_t src)
+void move_output_instruction(emitter_t *emitter, uint16_t src)
 {
     emit_reg_to_reg(emitter, "movq %%%s, %%%s", emitter->registers[src], "rax");
 }
@@ -464,7 +462,7 @@ void generate_variable(emitter_t *emitter, registers_t *regs, Slice *name, uint1
     }
     else
     {
-        //TODO: Check that the variable doesn't need to moved and change it
+        // TODO: Check that the variable doesn't need to moved and change it
         move_instruction(emitter, reg, base);
     }
 }
@@ -578,7 +576,7 @@ void compile_uneven_expression_tree(emitter_t *emitter, registers_t *regs, expre
 
 uint16_t generate_expression(emitter_t *emitter, expression *expr, uint32_t statement_index, block_t *block, registers_t *reg)
 {
-    expr = preprocess_expression(expr); //TODO: preprocess_expression hsould be before everything in the preprocessing section
+    expr = preprocess_expression(expr); // TODO: preprocess_expression hsould be before everything in the preprocessing section
     expr_function **functions = malloc(sizeof(expr_function *) * 2);
     struct compile_expr compile_expr = {functions, 0, 2};
     comb_expression(expr, &compile_expr);
@@ -606,9 +604,17 @@ uint16_t generate_expression(emitter_t *emitter, expression *expr, uint32_t stat
     return output_register;
 }
 
-void function_call_statement(emitter_t* emitter, statement* statement, registers_t* regs, block_t* block, uint32_t statement_index)
+void return_function_statement(emitter_t *emitter)
 {
+    emit_fix_stack(emitter);
+    emit(emitter, "movq %rbp, %rsp");
+    emit(emitter, "popq %rbp");
+    add_rsp(emitter, 1);
+    emit(emitter, "retq");
+}
 
+void function_call_statement(emitter_t *emitter, statement *statement, registers_t *regs, block_t *block, uint32_t statement_index)
+{
 }
 
 void compile_statement_in_block(emitter_t *emitter, statement *stmt, registers_t *regs, block_t *block, uint32_t statement_index)

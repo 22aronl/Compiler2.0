@@ -46,6 +46,8 @@ size_t emit_if_number(emitter_t* emitter);
 
 size_t emit_while_number(emitter_t* emitter);
 
+void emit_fix_stack(emitter_t* emitter);
+
 bool align_stack(emitter_t *emitter);
 
 bool align_stack_function(emitter_t *emitter, int16_t offset);

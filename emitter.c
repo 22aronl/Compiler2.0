@@ -97,6 +97,14 @@ void push_variable(emitter_t *emitter, Slice *var, char *reg)
     printf("movq %%%s, %d(%%rbp)\n", reg, get_offset(emitter, var));
 }
 
+//makes sure the stack is aligned up to the stored rbp location
+void emit_fix_stack(emitter_t* emitter)
+{
+    if(emitter->stack_pointer != 8)
+    {
+        shift_stack(emitter, - emitter->stack_pointer / 8 + 1);
+    }
+}
 
 void pop_variable(emitter_t *emitter, Slice *var, char *reg)
 {
