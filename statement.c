@@ -155,7 +155,7 @@ void compile_statement(emitter_t *emitter, statement *s)
         pop_register(emitter, "rax");
         emit(emitter, "movq %rbp, %rsp");
         emit(emitter, "popq %rbp");
-        add_rsp(emitter);
+        add_rsp(emitter, 1);
         emit(emitter, "retq");
         break;
     }
