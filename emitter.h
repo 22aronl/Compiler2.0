@@ -67,3 +67,5 @@ void pop_variable(emitter_t *emitter, Slice *var, char *reg);
 void emit_number_to_reg(emitter_t *emitter, char *instruction, uint64_t number, char *reg);
 
 void emit_reg_to_reg(emitter_t *emitter, char *instruction, char *reg1, char *reg2);
+
+void pop_variable_to_reg(emitter_t* emitter, uint32_t offset, char* reg);

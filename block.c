@@ -450,7 +450,6 @@ void unstore_instruction(emitter_t *emitter, uint16_t reg)
     pop_register(emitter, emitter->registers[reg]);
 }
 
-
 void create_function_stack(emitter_t *emitter, struct compile_expr *com_expr, registers_t *regs)
 {
     for (uint16_t i = 0; i < com_expr->index; i++)
@@ -472,7 +471,7 @@ void move_output_instruction(emitter_t *emitter, uint16_t src, char *dest)
 
 void generate_function(emitter_t *emitter, registers_t *regs, uint16_t base)
 {
-    // TODO: add support
+    pop_variable_to_reg(emitter, 8*regs->functions_counter++, emitter->registers[base]);
 }
 
 void generate_variable(emitter_t *emitter, registers_t *regs, Slice *name, uint16_t base)
@@ -603,16 +602,20 @@ uint16_t generate_expression(emitter_t *emitter, expression *expr, uint32_t stat
     expr_function **functions = malloc(sizeof(expr_function *) * 2);
     struct compile_expr compile_expr = {functions, 0, 2};
     comb_expression(expr, &compile_expr);
+    uint16_t old_function_size = reg->functions_size;
+    size_t old_functions_stack = reg->functions_stack;
+    uint16_t old_functions_counter = reg->functions_counter;
 
     if (compile_expr.index > 0)
     {
+        reg->functions_size = compile_expr.index;
+        reg->functions_stack = emitter->stack_pointer;
+        reg->functions_counter = 0;
         clean_up_block(reg);
         create_function_stack(emitter, &compile_expr, reg);
     }
 
     label_ershov_number(expr);
-
-    create_function_stack(emitter, &compile_expr, reg);
 
     uint16_t available_registers_size = available_registers(reg, statement_index);
     uint16_t *available_registers = malloc(sizeof(uint16_t) * available_registers_size);
@@ -631,6 +634,12 @@ uint16_t generate_expression(emitter_t *emitter, expression *expr, uint32_t stat
         output_register = available_registers[expr->ershov_number - 1];
     }
 
+    reg->functions_size = old_function_size;
+    reg->functions_stack = old_functions_stack;
+    reg->functions_counter = old_functions_counter;
+
+    shift_stack(emitter, compile_expr.index);
+
     return output_register;
 }
 
@@ -643,20 +652,30 @@ void return_function_statement(emitter_t *emitter)
     emit(emitter, "retq");
 }
 
-void print_instruction(emitter_t *emitter, uint16_t register_index, registers_t* reg)
+void print_instruction(emitter_t *emitter, uint16_t register_index, registers_t *reg)
 {
-    //TODO: IMplement
+    bool change = align_stack(emitter);
+    return_register_to_memory(reg, 11);
+    return_register_to_memory(reg, 12);
+    emit(emitter, "mov %rax, %rsi");
+    emit(emitter, "mov $0, %rax");
+    emit(emitter, "lea format(%rip),%rdi");
+    emit(emitter, ".extern printf");
+    emit(emitter, "call printf");
+    realign_stack(emitter, change);
 }
 
-void function_call_statement(emitter_t *emitter, struct func* func, registers_t *regs, block_t *block, uint32_t statement_index)
+void function_call_statement(emitter_t *emitter, struct func *func, registers_t *regs, block_t *block, uint32_t statement_index)
 {
-    for(int i = 0; i < func->args; i++)
+    for (int i = 0; i < func->args; i++)
     {
         uint16_t register_index = generate_expression(emitter, func->parameters[i], statement_index, block, regs);
         push_register(emitter, emitter->registers[register_index]);
     }
     clean_up_block(regs);
+    bool change = align_stack(emitter);
     emit_name(emitter, "call %.*s\n", func->name);
+    realign_stack(emitter, change);
 }
 
 void compile_statement_in_block(emitter_t *emitter, statement *stmt, registers_t *regs, block_t *block, uint32_t statement_index)

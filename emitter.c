@@ -116,6 +116,11 @@ void pop_variable(emitter_t *emitter, Slice *var, char *reg)
     printf("movq %d(%%rbp), %%%s\n", get_offset(emitter, var), reg);
 }
 
+void pop_variable_to_reg(emitter_t* emitter, uint32_t offset, char* reg)
+{
+    printf("movq -%d(%%rbp), %%%s\n", offset, reg);
+}
+
 void set_up_assembly(emitter_t *emitter)
 {
     emit(emitter, "    .data");

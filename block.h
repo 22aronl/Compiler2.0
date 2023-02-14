@@ -12,6 +12,10 @@ typedef struct {
     Slice** name_array;
     struct map* function_variable_map;
     emitter_t* emitter;
+
+    size_t functions_stack;
+    uint16_t functions_size;
+    uint16_t functions_counter;
 } registers_t;
 
 struct queue {
