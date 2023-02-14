@@ -19,13 +19,14 @@ statement **double_statements(statement **statements, uint32_t index, uint32_t *
     return statements;
 }
 
-statement **add_new_block(block_t **blocks, uint32_t *block_index, uint32_t *block_size, statement **cur_statements, uint32_t *cur_statement_index, uint32_t *cur_statement_size)
+statement **add_new_block(block_t ***blocks2, uint32_t *block_index, uint32_t *block_size, statement **cur_statements, uint32_t *cur_statement_index, uint32_t *cur_statement_size)
 {
     if (*block_index == *block_size)
     {
         *block_size *= 2;
-        blocks = realloc(blocks, sizeof(block_t *) * *block_size);
+        *blocks2 = realloc(*blocks2, sizeof(block_t *) * *block_size);
     }
+    block_t** blocks = *blocks2;
     blocks[*block_index] = malloc(sizeof(block_t));
     blocks[*block_index]->statements = cur_statements;
     blocks[*block_index]->statement_size = *cur_statement_index;
@@ -96,7 +97,7 @@ void parse_block(statement **body, uint32_t size_body, block_t **block_array, ui
                 cur_statements[cur_statement_index++] = s;
             }
 
-            add_new_block(blocks, block_index, block_size, cur_statements, &cur_statement_index, &cur_statement_size);
+            add_new_block(&blocks, block_index, block_size, cur_statements, &cur_statement_index, &cur_statement_size);
             cur_statements = malloc(sizeof(statement *) * 2);
             cur_statement_size = 2;
             cur_statement_index = 0;
@@ -111,7 +112,7 @@ void parse_block(statement **body, uint32_t size_body, block_t **block_array, ui
                 {
                     // EVALUATE THE PARAMETERS
                     cur_statements[cur_statement_index++] = s;
-                    add_new_block(blocks, block_index, block_size, cur_statements, &cur_statement_index, &cur_statement_size);
+                    add_new_block(&blocks, block_index, block_size, cur_statements, &cur_statement_index, &cur_statement_size);
                     cur_statements = malloc(sizeof(statement *) * 2);
                     cur_statement_size = 2;
                     cur_statement_index = 0;
@@ -162,7 +163,7 @@ void parse_block(statement **body, uint32_t size_body, block_t **block_array, ui
 
     if (cur_statement_index > 0)
     {
-        add_new_block(blocks, block_index, block_size, cur_statements, &cur_statement_index, &cur_statement_size);
+        add_new_block(&blocks, block_index, block_size, cur_statements, &cur_statement_index, &cur_statement_size);
     }
 }
 
