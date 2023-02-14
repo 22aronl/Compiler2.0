@@ -37,6 +37,7 @@ expression* preprocess_expression(expression *e)
                 free_expression(e->left);
                 e->character = malloc(sizeof(character));
                 e->character->value = result;
+                e->type = t_num;
             }
             return e;
         }
