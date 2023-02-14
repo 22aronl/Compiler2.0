@@ -24,7 +24,7 @@ int32_t get_map_offset(struct map* map, Slice* key) {
             }
         }
     }
-    return -1;
+    return 0;
 }
 
 void add_map_offset(struct map* map, Slice* key, int32_t value) {
