@@ -7,9 +7,6 @@ fun main() {
     {
         z = 2
     }
-    else
-    {
-        z = 3
-    }
+
     return z
 }
