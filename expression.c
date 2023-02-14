@@ -8,6 +8,42 @@
 #include "statement.h"
 #include "emitter.h"
 
+expression* preprocess_expression(expression *e)
+{
+    switch (e->type)
+    {
+        case t_not:
+            if(e->left->type == t_not)
+            {
+                expression *tmp = e->left->left;
+                free(e->left);
+                free(e);
+                e = tmp;
+            }
+            return preprocess_expression(e);
+        case t_num:
+        case t_var:
+        case t_func:
+        case t_print:
+            return e;
+        default:
+        {
+            e->left = preprocess_expression(e->left);
+            e->right = preprocess_expression(e->right);
+            if(e->left->type == t_num && e->right->type == t_num)
+            {
+                uint64_t result = eval_expr(NULL, NULL, e);
+                free_expression(e->right);
+                free_expression(e->left);
+                e->character = malloc(sizeof(character));
+                e->character->value = result;
+            }
+            return e;
+        }
+    }   
+    //TODO: add more cases
+}
+
 void compile_expression(emitter_t *emitter, expression *e)
 {
     switch (e->type)
