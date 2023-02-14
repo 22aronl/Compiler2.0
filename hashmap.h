@@ -15,7 +15,7 @@ struct map {
     bool main;
 };
 
-
+int32_t get_map_offset2(struct map* map, Slice* key);
 int32_t get_map_offset(struct map*, Slice* var);
 void add_map_offset(struct map*, Slice*, int32_t);
 
