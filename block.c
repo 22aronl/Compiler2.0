@@ -649,7 +649,14 @@ void compile_method(emitter_t *emitter, struct declare *declare)
             {
                 declare_variable(emitter, q_cur->name, -(emitter->var_offset++) * 8);
             }
+            struct queue_name* q_current = q_cur;
+            q_cur = q_current->next;
+            free(q_current);
         }
+    }
+    else
+    {
+        free(queue->head);
     }
     free(queue);
 
