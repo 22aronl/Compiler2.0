@@ -26,7 +26,7 @@ void compile_expression(emitter_t *emitter, expression *e)
         compile_expression(emitter, e->right);
         pop_register(emitter, "rax");
         pop_register(emitter, "rbx");
-        emit(emitter, "imul \%rbx, \%rax");
+        emit(emitter, "mul \%rbx");
         push_register(emitter, "rax");
         break;
     case t_divide:
