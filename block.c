@@ -731,7 +731,7 @@ void compile_method(emitter_t *emitter, struct declare *declare)
             if (block->out_blocks_index > 1)
                 emit_number(emitter, "je label%d_", method->blocks[block->out_blocks[1]]->block_label);
             else
-                emit_number(emitter, "je label%d_", method->blocks[block->out_blocks[0]]->block_label);
+                emit_number(emitter, "je label%d_", method->blocks[block->out_blocks[1]]->block_label);
         }
 
         clean_up_block(reg);
