@@ -123,13 +123,13 @@ void parse_block(statement **body, uint32_t size_body, block_t **block_array, ui
                     blocks[current_block]->unconditional_jump = false;
                     blocks[current_block]->jump_expression = s->internal->if_statement->condition;
 
-                    parse_block(s->internal->if_statement->body, s->internal->if_statement->size_body, &blocks, block_index, block_size, exit_block);
+                    parse_block(s->internal->if_statement->body, s->internal->if_statement->size_body, blocks, block_index, block_size, exit_block);
                     uint32_t if_end = *block_index - 1;
                     uint32_t start_after_if = *block_index;
 
                     if (s->internal->if_statement->has_else)
                     {
-                        parse_block(s->internal->if_statement->else_body, s->internal->if_statement->size_else, &blocks, block_index, block_size, exit_block);
+                        parse_block(s->internal->if_statement->else_body, s->internal->if_statement->size_else, blocks, block_index, block_size, exit_block);
                         uint32_t else_end = *block_index - 1;
 
                         add_to_out(blocks[current_block], start_after_if);
@@ -148,7 +148,7 @@ void parse_block(statement **body, uint32_t size_body, block_t **block_array, ui
                     blocks[current_block]->unconditional_jump = false;
                     blocks[current_block]->jump_expression = s->internal->while_statement->condition;
 
-                    parse_block(s->internal->while_statement->body, s->internal->while_statement->size_body, &blocks, block_index, block_size, exit_block);
+                    parse_block(s->internal->while_statement->body, s->internal->while_statement->size_body, blocks, block_index, block_size, exit_block);
                     uint32_t while_end = *block_index - 1;
                     uint32_t start_after_while = *block_index;
 
@@ -188,7 +188,7 @@ method_t *parse_method(struct declare *declare)
     blocks[0]->out_blocks_size = 2;
     blocks[0]->unconditional_jump = true;
 
-    parse_block(declare->body, declare->size_body, &blocks, &block_index, &block_size, exit_block);
+    parse_block(declare->body, declare->size_body, blocks, &block_index, &block_size, exit_block);
     struct queue_name *qhead = malloc(sizeof(struct queue_name));
     qhead->next = NULL;
     qhead->name = NULL;
