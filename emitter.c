@@ -3,14 +3,14 @@
 
 #include "emitter.h"
 
-void sub_rsp(emitter_t *emitter)
+void sub_rsp(emitter_t *emitter, int16_t offset)
 {
-    emitter->stack_pointer += 8;
+    emitter->stack_pointer += offset * 8;
 }
 
-void add_rsp(emitter_t *emitter)
+void add_rsp(emitter_t *emitter, int16_t offset)
 {
-    emitter->stack_pointer -= 8;
+    emitter->stack_pointer -= offset * 8;
 }
 
 bool align_stack(emitter_t *emitter)
@@ -18,7 +18,7 @@ bool align_stack(emitter_t *emitter)
     if (emitter->stack_pointer % 16 != 0)
     {
         printf("subq $8, %%rsp\n");
-        sub_rsp(emitter);
+        sub_rsp(emitter, 1);
         return true;
     }
     return false;
@@ -29,7 +29,7 @@ bool align_stack_function(emitter_t *emitter, int16_t offset)
     if ((emitter->stack_pointer + offset * 8) % 16 != 0)
     {
         printf("subq $8, %%rsp\n");
-        sub_rsp(emitter);
+        sub_rsp(emitter, 1);
         return true;
     }
     return false;
@@ -40,20 +40,20 @@ void realign_stack(emitter_t *emitter, bool change)
     if (change)
     {
         printf("addq $8, %%rsp\n");
-        add_rsp(emitter);
+        add_rsp(emitter, 1);
     }
 }
 
 void push_register(emitter_t *emitter, char *name)
 {
     printf("pushq %%%s\n", name);
-    sub_rsp(emitter);
+    sub_rsp(emitter, 1);;
 }
 
 void pop_register(emitter_t *emitter, char *name)
 {
     printf("popq %%%s\n", name);
-    add_rsp(emitter);
+    add_rsp(emitter, 1);
 }
 
 void emit(emitter_t *emitter, char *instruction)
@@ -87,7 +87,7 @@ int32_t get_offset(emitter_t *emitter, Slice *var)
         offset = -(emitter->var_offset++) * 8;
         declare_variable(emitter, var, offset);
         emit(emitter, "sub $8, %rsp");
-        sub_rsp(emitter);
+        sub_rsp(emitter, 1);
     }
     return offset;
 }
@@ -116,7 +116,7 @@ void emit_start_function(emitter_t *emitter, Slice *name)
     emit_name(emitter, "%.*s:\n", name);
     emit(emitter, "pushq %rbp");
     emit(emitter, "movq %rsp, %rbp");
-    sub_rsp(emitter);
+    sub_rsp(emitter, 1);
 }
 
 void emit_end_function(emitter_t *emitter)
@@ -124,8 +124,22 @@ void emit_end_function(emitter_t *emitter)
     emit(emitter, "movq $0, %rax");
     emit(emitter, "movq %rbp, %rsp");
     emit(emitter, "popq %rbp");
-    add_rsp(emitter);
+    add_rsp(emitter, 1);
     emit(emitter, "retq");
+}
+
+void shift_stack(emitter_t *emitter, int16_t offset)
+{
+    if (offset > 0)
+    {
+        emit_number(emitter, "subq $%d, %%rsp", offset * 8);
+        sub_rsp(emitter, offset);
+    }
+    else if (offset < 0)
+    {
+        emit_number(emitter, "addq $%d, %%rsp", -offset * 8);
+        add_rsp(emitter, -offset);
+    }
 }
 
 void declare_variable(emitter_t *emitter, Slice *var, int16_t index)

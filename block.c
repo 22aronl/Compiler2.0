@@ -611,6 +611,7 @@ void compile_method(emitter_t *emitter, struct declare *declare)
     emit_start_function(emitter, declare->name);
 
     // Declare my variables
+    
 
     for (uint32_t i = 0; i < method->block_size; i++)
     {
