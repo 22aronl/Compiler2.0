@@ -244,7 +244,7 @@ void add_to_variables(block_t *block, int32_t input, int32_t hash)
     while (hash >= block->variables_size)
     {
         block->variables_visited = realloc(block->variables_visited, sizeof(bool) * block->variables_size * 2);
-        for(uint32_t i = block->variables_size; i < block->variables_size * 2; i++)
+        for (uint32_t i = block->variables_size; i < block->variables_size * 2; i++)
         {
             block->variables_visited[i] = false;
         }
@@ -478,7 +478,7 @@ void move_output_instruction(emitter_t *emitter, uint16_t src, char *dest)
 
 void generate_function(emitter_t *emitter, registers_t *regs, uint16_t base)
 {
-    pop_variable_to_reg(emitter, 8*regs->functions_counter++, emitter->registers[base]);
+    pop_variable_to_reg(emitter, 8 * regs->functions_counter++, emitter->registers[base]);
 }
 
 void generate_variable(emitter_t *emitter, registers_t *regs, Slice *name, uint16_t base)
@@ -662,8 +662,10 @@ void return_function_statement(emitter_t *emitter)
 void print_instruction(emitter_t *emitter, uint16_t register_index, registers_t *reg)
 {
     bool change = align_stack(emitter);
-    return_register_to_memory(reg, 11);
-    return_register_to_memory(reg, 12);
+    if (reg->registers[11] != -1)
+        move_instruction(emitter, 11, register_index);
+    if (reg->registers[12] != -1)
+        return_register_to_memory(reg, 12);
     emit(emitter, "mov %rax, %rsi");
     emit(emitter, "mov $0, %rax");
     emit(emitter, "lea format(%rip),%rdi");
@@ -720,8 +722,8 @@ void compile_statement_in_block(emitter_t *emitter, statement *stmt, registers_t
         break;
     case s_declare:
     {
-        //print stmt->type
-        
+        // print stmt->type
+
         printf("YA DONE GOOFED");
         break;
     }
