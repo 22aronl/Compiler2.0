@@ -36,6 +36,43 @@ void free_map(struct map *map)
     }
 }
 
+void find_variables(emitter_t *emitter, statement *s)
+{
+    if (s->type == s_var)
+    {
+        int32_t offset = get_map_offset(emitter->var_map, s->internal->var->name);
+        if (offset == 0)
+        {
+            offset = -(emitter->var_offset++) * 8;
+            declare_variable(emitter, s->internal->var->name, offset);
+            emit(emitter, "sub $8, %rsp");
+            sub_rsp(emitter);
+        }
+    }
+    else if (s->type == s_if)
+    {
+        for (uint32_t i = 0; i < s->internal->if_statement->size_body; i++)
+        {
+            find_variables(emitter, s->internal->if_statement->body[i]);
+        }
+
+        if (s->internal->if_statement->has_else)
+        {
+            for (uint32_t i = 0; i < s->internal->if_statement->size_else; i++)
+            {
+                find_variables(emitter, s->internal->if_statement->else_body[i]);
+            }
+        }
+    }
+    else if (s->type == s_while)
+    {
+        for (uint32_t i = 0; i < s->internal->while_statement->size_body; i++)
+        {
+            find_variables(emitter, s->internal->while_statement->body[i]);
+        }
+    }
+}
+
 void declare_function(emitter_t *emitter, struct declare *declare)
 {
 
@@ -51,6 +88,11 @@ void declare_function(emitter_t *emitter, struct declare *declare)
     for (uint16_t i = 0; i < declare->args; i++)
     {
         declare_variable(emitter, &declare->parameters[i], (declare->args - i - 1) * 8 + 16);
+    }
+
+    for (uint32_t i = 0; i < declare->size_body; i++)
+    {
+        find_variables(emitter, declare->body[i]);
     }
 
     for (uint32_t i = 0; i < declare->size_body; i++)
@@ -78,7 +120,7 @@ void call_function(emitter_t *emitter, struct func *func)
         compile_expression(emitter, func->parameters[i]);
     }
     emit_name(emitter, "call %.*s\n", func->name);
-    
+
     for (uint16_t i = 0; i < func->args; i++)
     {
         pop_register(emitter, "rbx");
