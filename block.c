@@ -37,6 +37,7 @@ block_t **add_new_block(block_t **blocks, uint32_t *block_index, uint32_t *block
     blocks[*block_index]->in_blocks = malloc(sizeof(uint32_t));
     blocks[*block_index]->in_blocks_index = 0;
     blocks[*block_index]->in_blocks_size = 2;
+    blocks[*block_index]->is_while = false;
 
     (*block_index)++;
 
@@ -152,6 +153,7 @@ block_t **parse_block(statement **body, uint32_t size_body, block_t **blocks, ui
                     blocks[current_block]->has_jump = true;
                     blocks[current_block]->unconditional_jump = false;
                     blocks[current_block]->jump_expression = s->internal->while_statement->condition;
+                    blocks[current_block]->is_while = true;
 
                     blocks = parse_block(s->internal->while_statement->body, s->internal->while_statement->size_body, blocks, block_index, block_size, exit_block);
                     uint32_t while_end = *block_index - 1;
@@ -159,7 +161,10 @@ block_t **parse_block(statement **body, uint32_t size_body, block_t **blocks, ui
 
                     add_to_out(blocks[current_block], start_after_while);
                     add_to_out(blocks[current_block], current_block + 1);
-                    add_to_out(blocks[while_end], current_block + 1);
+                    add_to_out(blocks[while_end], current_block);
+                    blocks[while_end]->has_jump = true;
+                    blocks[while_end]->unconditional_jump = true;
+                    blocks[while_end]->is_while = true;
                 }
             }
         }
@@ -714,7 +719,11 @@ void compile_method(emitter_t *emitter, struct declare *declare)
         shift_stack(emitter, counter);
 
     for (uint32_t i = 0; i < method->block_size; i++)
+    {
         method->blocks[i]->block_label = create_label(emitter);
+        if (method->blocks[i]->is_while)
+            method->blocks[i]->while_block_label = create_label(emitter);
+    }
 
     for (uint32_t i = 0; i < method->block_size; i++)
     {
@@ -730,6 +739,9 @@ void compile_method(emitter_t *emitter, struct declare *declare)
 
         if (block->has_jump)
         {
+            if (block->is_while && !block->unconditional_jump)
+                emit_number(emitter, "label%d_:", block->while_block_label);
+
             if (!block->unconditional_jump)
             {
                 uint16_t register_index = generate_expression(emitter, block->jump_expression, 0, block, reg);
@@ -740,7 +752,10 @@ void compile_method(emitter_t *emitter, struct declare *declare)
             }
             else
             {
-                emit_number(emitter, "jmp label%d_", method->blocks[block->out_blocks[0]]->block_label);
+                if (block->is_while)
+                    emit_number(emitter, "jmp label%d_", method->blocks[block->out_blocks[0]]->while_block_label);
+                else
+                    emit_number(emitter, "jmp label%d_", method->blocks[block->out_blocks[0]]->block_label);
             }
         }
 

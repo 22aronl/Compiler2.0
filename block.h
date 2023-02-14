@@ -64,6 +64,8 @@ typedef struct {
     bool* out_blocks_dag;
     bool* defined_in_block;
     uint32_t block_label;
+    bool is_while;
+    uint32_t while_block_label;
 } block_t;
 
 
