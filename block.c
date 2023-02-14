@@ -796,7 +796,7 @@ void compile_method(emitter_t *emitter, struct declare *declare)
             method->blocks[i]->while_block_label = create_label(emitter);
     }
 
-    for (uint32_t i = 0; i < method->block_size; i++)
+    for (uint32_t i = 1; i < method->block_size; i++)
     {
         block_t *block = method->blocks[i];
         emit_number(emitter, "label%d_: ", block->block_label);
