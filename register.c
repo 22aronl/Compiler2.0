@@ -37,7 +37,7 @@ bool is_register_needed(registers_t *reg, int16_t statement_index, uint16_t vari
         {
             return true;
         }
-        else if (var < 0 && var > -statement_index)
+        else if (var < 0 && -var > statement_index)
         {
             return false;
         }

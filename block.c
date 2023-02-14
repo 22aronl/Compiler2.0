@@ -570,7 +570,7 @@ void compile_uneven_expression_tree(emitter_t *emitter, registers_t *regs, expre
 
 uint16_t generate_expression(emitter_t *emitter, expression *expr, uint32_t statement_index, block_t *block, registers_t *reg)
 {
-    expr = preprocess_expression(expr);
+    expr = preprocess_expression(expr); //TODO: preprocess_expression hsould be before everything in the preprocessing section
     expr_function **functions = malloc(sizeof(expr_function *) * 2);
     struct compile_expr compile_expr = {functions, 0, 2};
     comb_expression(expr, &compile_expr);
@@ -683,7 +683,6 @@ void compile_method(emitter_t *emitter, struct declare *declare)
             compile_statement_in_block(emitter, stmt, reg, block, j);
         }
         clean_up_block(reg);
-
         free(reg);
     }
 
