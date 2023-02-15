@@ -97,7 +97,7 @@ void declare_function(emitter_t *emitter, struct declare *declare)
 
     for (uint32_t i = 0; i < declare->size_body; i++)
     {
-        compile_statement(emitter, declare->body[i], declare->name);
+        compile_statement(emitter, declare->body[i], declare);
     }
 
     emitter->var_offset = old_offset;
@@ -169,7 +169,7 @@ void compile_statement(emitter_t *emitter, statement *s, struct declare *declare
             emit_number(emitter, "jmp endif%d_", if_number);
             emit_number(emitter, "else%d_:", if_number);
             for (uint32_t i = 0; i < s->internal->if_statement->size_else; i++)
-                compile_statement(emitter, s->internal->if_statement->else_body[i].name, declare);
+                compile_statement(emitter, s->internal->if_statement->else_body[i], declare);
             emit_number(emitter, "endif%d_:", if_number);
         }
         else
@@ -199,7 +199,7 @@ void compile_statement(emitter_t *emitter, statement *s, struct declare *declare
             {
                 compile_expression(emitter, s->internal->return_statement->expr->character->function->parameters[i]);
                 pop_register(emitter, "rax");
-                push_variable(emitter, declare->parameters[i]->name, "rax");
+                push_variable(emitter, declare->parameters[i], "rax");
             }
             emit(emitter, "movq %rbp, %rsp");
             emit(emitter, "popq %rbp");
