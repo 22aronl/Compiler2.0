@@ -13,13 +13,12 @@ expression* preprocess_expression(expression *e)
     switch (e->type)
     {
         case t_not:
-            if(e->left->type == t_not)
+            e = preprocess_expression(e->left);
+            if(e->left->type == t_num)
             {
-                expression *tmp = e->left->left;
-                free(e->left);
-                free(e);
-                e = tmp;
-                return preprocess_expression(e);
+                e->character->value = !e->left->character->value;
+                free_expression(e->left);
+                e->type = t_num;
             }
             return e;
         case t_num:
