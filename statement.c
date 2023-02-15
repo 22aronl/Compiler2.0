@@ -97,7 +97,7 @@ void declare_function(emitter_t *emitter, struct declare *declare)
 
     for (uint32_t i = 0; i < declare->size_body; i++)
     {
-        compile_statement(emitter, declare->body[i]);
+        compile_statement(emitter, declare->body[i], declare->name);
     }
 
     emitter->var_offset = old_offset;
@@ -128,7 +128,7 @@ void call_function(emitter_t *emitter, struct func *func)
     realign_stack(emitter, change);
 }
 
-void compile_statement(emitter_t *emitter, statement *s)
+void compile_statement(emitter_t *emitter, statement *s, struct declare *declare)
 {
     switch (s->type)
     {
@@ -163,13 +163,13 @@ void compile_statement(emitter_t *emitter, statement *s)
         size_t if_number = emit_if_number(emitter);
         emit_number(emitter, "je else%d_", if_number);
         for (uint32_t i = 0; i < s->internal->if_statement->size_body; i++)
-            compile_statement(emitter, s->internal->if_statement->body[i]);
+            compile_statement(emitter, s->internal->if_statement->body[i], declare);
         if (s->internal->if_statement->has_else)
         {
             emit_number(emitter, "jmp endif%d_", if_number);
             emit_number(emitter, "else%d_:", if_number);
             for (uint32_t i = 0; i < s->internal->if_statement->size_else; i++)
-                compile_statement(emitter, s->internal->if_statement->else_body[i]);
+                compile_statement(emitter, s->internal->if_statement->else_body[i].name, declare);
             emit_number(emitter, "endif%d_:", if_number);
         }
         else
@@ -187,12 +187,25 @@ void compile_statement(emitter_t *emitter, statement *s)
         emit(emitter, "cmp $0, %rax");
         emit_number(emitter, "je endwhile%d_", while_number);
         for (uint32_t i = 0; i < s->internal->while_statement->size_body; i++)
-            compile_statement(emitter, s->internal->while_statement->body[i]);
+            compile_statement(emitter, s->internal->while_statement->body[i], declare);
         emit_number(emitter, "jmp while%d_", while_number);
         emit_number(emitter, "endwhile%d_:", while_number);
         break;
     }
     case s_return:
+        if (s->internal->return_statement->expr->type == t_func && slice_eq2(s->internal->return_statement->expr->character->function->name, declare->name))
+        {
+            for (uint16_t i = 0; i < s->internal->return_statement->expr->character->function->args; i++)
+            {
+                compile_expression(emitter, s->internal->return_statement->expr->character->function->parameters[i]);
+                pop_register(emitter, "rax");
+                push_variable(emitter, declare->parameters[i]->name, "rax");
+            }
+            emit(emitter, "movq %rbp, %rsp");
+            emit(emitter, "popq %rbp");
+            emit_name(emitter, "jmp %.*s\n", declare->name);
+            break;
+        }
         compile_expression(emitter, s->internal->return_statement->expr);
         pop_register(emitter, "rax");
         emit(emitter, "movq %rbp, %rsp");

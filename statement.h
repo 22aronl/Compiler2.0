@@ -81,7 +81,7 @@ struct statement
     enum type_of_s type;
 };
 
-void compile_statement(emitter_t*, statement*);
+void compile_statement(emitter_t*, statement*, struct declare *declare);
 void call_function(emitter_t *emitter, struct func *func);
 
 void free_function(struct func *func);

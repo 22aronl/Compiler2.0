@@ -687,7 +687,7 @@ void run_compile(Interpreter *in)
         {
             break;
         }
-        compile_statement(em, state);
+        compile_statement(em, state, NULL);
         add_statement(in, state);
     }
 
