@@ -68,7 +68,7 @@ void push_register(emitter_t *emitter, char *name)
         {
             emitter->emit_instruction->pop = false;
             emitter->emit_instruction->reg = name;
-            printf("pushq %%%s", name);
+            printf("pushq %%%s", name); //TODO: WARNING THIS WIILL RUN INTO MAJOR ISSUES ON NOT STACK COMPILER
         }
     }
     else
