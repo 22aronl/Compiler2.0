@@ -4,7 +4,26 @@
   * What is the runtime for both versions?
   * Try to explain the difference
 
+  The interpreter took around 55 seconds to run while the compiled version took 590 milliseconds to run.
+  The Interpreter is slower than the compiled version I think is mainly because of the overhead of the interpreter itself.
+  Every time the interpreter needed to call a new function, which happens a lot in the test, it had to create and destroy a new hashmap
+  that contained all the internal variables of the function. This is not the case with the compiled version. In addition, the Interpreter
+  had to emulate variables, forced to pull from and push to the local hashmap each time a variable was used. The compiled verision on the otherhand
+  knew where the local variables were and could access them directly.
+
 - Why is it a good idea to "mov $0,%rax" before calling printf?
+
+    We zero out %rax before calling printf is becuase printf uses a variable number of arguments and the %rax register specifies how many
+    SSE registers (the floating point equiv of MMX) are used. Since we don't use any of thsoe registers, %rax should be zeroed out.
+
+    #http://6.s081.scripts.mit.edu/sp18/x86-64-architecture-guide.html
 
 - Why does my implementation of p3.c use the "-static" gcc flag? Do your best
   to explain the reason. Try to remove the flag and see the what happens
+
+  The "-static" gcc flag is used to link the program with the static C standard library. This means that all required functions will
+  be stored in the executable file. If we remove the flag, the program will not be able to find the standard library functions in the executable.
+  So, in this case, when I removed the flag, the code could not find the printf function and threw errors
+
+  #https://gcc.gnu.org/onlinedocs/gcc/Link-Options.html
+  #https://stackoverflow.com/questions/8692128/static-option-for-gcc

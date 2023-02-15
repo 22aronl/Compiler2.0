@@ -18,6 +18,10 @@ void add_expr_func(expr_function *expr, struct compile_expr *comp)
     comp->function[comp->index++] = expr;
 }
 
+
+
+
+
 void comb_expression(expression *e, struct compile_expr *comp)
 {
 
@@ -81,30 +85,44 @@ void label_ershov_number(expression *e)
     }
 }
 
+
+/**
+ * This preprocesses the expression by removing any literals that it can
+*/
 expression* preprocess_expression(expression *e)
 {
     switch (e->type)
     {
         case t_not:
-            if(e->left->type == t_not)
-            {
-                expression *tmp = e->left->left;
-                free(e->left);
-                free(e);
-                e = tmp;
-            }
-            return preprocess_expression(e);
+            //TODO: FIx this for some reason
+            return e;
         case t_num:
         case t_var:
         case t_func:
         case t_print:
             return e;
         default:
+        {
+            e->left = preprocess_expression(e->left);
+            e->right = preprocess_expression(e->right);
+            if(e->left->type == t_num && e->right->type == t_num)
+            {
+                uint64_t result = eval_expr(NULL, NULL, e);
+                free_expression(e->right);
+                free_expression(e->left);
+                e->character = malloc(sizeof(character));
+                e->character->value = result;
+                e->type = t_num;
+            }
             return e;
+        }
     }   
     //TODO: add more cases
-}
+} 
 
+/**
+ * This compiles the expression into assembly through recursion, its values are then stroed onto the top of the stack
+*/
 void compile_expression(emitter_t *emitter, expression *e)
 {
     switch (e->type)
@@ -123,7 +141,7 @@ void compile_expression(emitter_t *emitter, expression *e)
         compile_expression(emitter, e->right);
         pop_register(emitter, "rax");
         pop_register(emitter, "rbx");
-        emit(emitter, "imul \%rbx, \%rax");
+        emit(emitter, "mul \%rbx");
         push_register(emitter, "rax");
         break;
     case t_divide:
@@ -132,7 +150,7 @@ void compile_expression(emitter_t *emitter, expression *e)
         pop_register(emitter, "rbx");
         pop_register(emitter, "rax");
         emit(emitter, "movq $0, %rdx");
-        emit(emitter, "idiv \%rbx");
+        emit(emitter, "div \%rbx");
         push_register(emitter, "rax");
         break;
     case t_mod:
@@ -141,7 +159,7 @@ void compile_expression(emitter_t *emitter, expression *e)
         pop_register(emitter, "rbx");
         pop_register(emitter, "rax");
         emit(emitter, "movq $0, %rdx");
-        emit(emitter, "idiv \%rbx");
+        emit(emitter, "div \%rbx");
         push_register(emitter, "rdx");
         break;
     case t_plus:
@@ -166,7 +184,7 @@ void compile_expression(emitter_t *emitter, expression *e)
         pop_register(emitter, "rbx");
         pop_register(emitter, "rax");
         emit(emitter, "cmp \%rbx, \%rax");
-        emit(emitter, "setl \%al");
+        emit(emitter, "setb \%al");
         emit(emitter, "movzbq \%al, \%rax");
         push_register(emitter, "rax");
         break;
@@ -176,7 +194,7 @@ void compile_expression(emitter_t *emitter, expression *e)
         pop_register(emitter, "rbx");
         pop_register(emitter, "rax");
         emit(emitter, "cmp \%rbx, \%rax");
-        emit(emitter, "setg \%al");
+        emit(emitter, "seta \%al");
         emit(emitter, "movzbq \%al, \%rax");
         push_register(emitter, "rax");
         break;
@@ -186,7 +204,7 @@ void compile_expression(emitter_t *emitter, expression *e)
         pop_register(emitter, "rbx");
         pop_register(emitter, "rax");
         emit(emitter, "cmp \%rbx, \%rax");
-        emit(emitter, "setle \%al");
+        emit(emitter, "setbe \%al");
         emit(emitter, "movzbq \%al, \%rax");
         push_register(emitter, "rax");
         break;
@@ -196,7 +214,7 @@ void compile_expression(emitter_t *emitter, expression *e)
         pop_register(emitter, "rbx");
         pop_register(emitter, "rax");
         emit(emitter, "cmp \%rbx, \%rax");
-        emit(emitter, "setge \%al");
+        emit(emitter, "setae \%al");
         emit(emitter, "movzbq \%al, \%rax");
         push_register(emitter, "rax");
         break;
@@ -225,7 +243,12 @@ void compile_expression(emitter_t *emitter, expression *e)
         compile_expression(emitter, e->right);
         pop_register(emitter, "rax");
         pop_register(emitter, "rbx");
-        emit(emitter, "and \%rbx, \%rax");
+        emit(emitter, "cmp $0, \%rax");
+        emit(emitter, "seta \%al");
+        emit(emitter, "cmp $0, \%rbx");
+        emit(emitter, "seta \%bl");
+        emit(emitter, "and \%bl, \%al");
+        emit(emitter, "movzbq \%al, \%rax");
         push_register(emitter, "rax");
         break;
     case t_or:
@@ -233,7 +256,12 @@ void compile_expression(emitter_t *emitter, expression *e)
         compile_expression(emitter, e->right);
         pop_register(emitter, "rax");
         pop_register(emitter, "rbx");
-        emit(emitter, "or \%rbx, \%rax");
+        emit(emitter, "cmp $0, \%rax");
+        emit(emitter, "seta \%al");
+        emit(emitter, "cmp $0, \%rbx");
+        emit(emitter, "seta \%bl");
+        emit(emitter, "or \%bl, \%al");
+        emit(emitter, "movzbq \%al, \%rax");
         push_register(emitter, "rax");
         break;
     case t_num:
@@ -255,7 +283,7 @@ void compile_expression(emitter_t *emitter, expression *e)
         emit(emitter, "mov $0, %rax");
 
         bool change = align_stack(emitter);
-        emit(emitter, "lea format(%rip),%rdi");
+        emit(emitter, "lea format_(%rip),%rdi");
         emit(emitter, ".extern printf");
         emit(emitter, "call printf");
         emit(emitter, "mov $0, %rax");

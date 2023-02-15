@@ -59,6 +59,7 @@ struct expression {
 };
 
 void compile_expression(emitter_t*, expression*);
+expression* preprocess_expression(expression *e);
 
 void free_expression(expression*);
 uint64_t eval_expr(Interpreter*, struct map*, expression*);

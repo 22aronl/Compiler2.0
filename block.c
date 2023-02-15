@@ -8,6 +8,9 @@
 #include "register.h"
 #include "hashmap.h"
 
+/**
+ * Checks if the statements array needs to be doubled
+*/
 statement **double_statements(statement **statements, uint32_t index, uint32_t *block_size)
 {
     if (index == *block_size)
@@ -19,6 +22,9 @@ statement **double_statements(statement **statements, uint32_t index, uint32_t *
     return statements;
 }
 
+/**
+ * Adds a new block to the block array and returns a new statement array
+*/
 block_t **add_new_block(block_t **blocks, uint32_t *block_index, uint32_t *block_size, statement **cur_statements, uint32_t *cur_statement_index, uint32_t *cur_statement_size)
 {
     if (*block_index == *block_size)
@@ -44,6 +50,9 @@ block_t **add_new_block(block_t **blocks, uint32_t *block_index, uint32_t *block
     return blocks;
 }
 
+/**
+ * Adds a out block to the current block (used for dag analysis)
+*/
 void add_to_out(block_t *block, uint32_t index)
 {
     if (block->out_blocks_index == block->out_blocks_size)
@@ -54,6 +63,9 @@ void add_to_out(block_t *block, uint32_t index)
     block->out_blocks[block->out_blocks_index++] = index;
 }
 
+/**
+ * Adds a in block to the current block (used for dag analysis)
+*/
 void add_to_in(block_t *block, uint32_t index)
 {
     if (block->in_blocks_index == block->in_blocks_size)
@@ -181,6 +193,10 @@ block_t **parse_block(statement **body, uint32_t size_body, block_t **blocks, ui
     return blocks;
 }
 
+
+/**
+ * parses a method and its internals and creates a method_t struct
+*/
 method_t *parse_method(struct declare *declare)
 {
     method_t *method = malloc(sizeof(method_t));

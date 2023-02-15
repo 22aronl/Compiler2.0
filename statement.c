@@ -36,6 +36,49 @@ void free_map(struct map *map)
     }
 }
 
+/**
+ * This finds all hte variables in the statement
+*/
+void find_variables(emitter_t *emitter, statement *s)
+{
+    if (s->type == s_var)
+    {
+        int32_t offset = get_map_offset(emitter->var_map, s->internal->var->name);
+        if (offset == 0)
+        {
+            offset = -(emitter->var_offset++) * 8;
+            declare_variable(emitter, s->internal->var->name, offset);
+            emit(emitter, "sub $8, %rsp");
+            sub_rsp(emitter, 1);
+        }
+    }
+    else if (s->type == s_if)
+    {
+        for (uint32_t i = 0; i < s->internal->if_statement->size_body; i++)
+        {
+            find_variables(emitter, s->internal->if_statement->body[i]);
+        }
+
+        if (s->internal->if_statement->has_else)
+        {
+            for (uint32_t i = 0; i < s->internal->if_statement->size_else; i++)
+            {
+                find_variables(emitter, s->internal->if_statement->else_body[i]);
+            }
+        }
+    }
+    else if (s->type == s_while)
+    {
+        for (uint32_t i = 0; i < s->internal->while_statement->size_body; i++)
+        {
+            find_variables(emitter, s->internal->while_statement->body[i]);
+        }
+    }
+}
+
+/**
+ * This is the code for declaring a new function in the assembly
+*/
 void declare_function(emitter_t *emitter, struct declare *declare)
 {
 
@@ -50,12 +93,17 @@ void declare_function(emitter_t *emitter, struct declare *declare)
 
     for (uint16_t i = 0; i < declare->args; i++)
     {
-        declare_variable(emitter, &declare->parameters[i], i * 8 + 16);
+        declare_variable(emitter, &declare->parameters[i], (declare->args - i - 1) * 8 + 16);
     }
 
     for (uint32_t i = 0; i < declare->size_body; i++)
     {
-        compile_statement(emitter, declare->body[i]);
+        find_variables(emitter, declare->body[i]);
+    }
+
+    for (uint32_t i = 0; i < declare->size_body; i++)
+    {
+        compile_statement(emitter, declare->body[i], declare);
     }
 
     emitter->var_offset = old_offset; //whats the point of this, the emitter is local
@@ -70,15 +118,18 @@ void declare_function(emitter_t *emitter, struct declare *declare)
     emit_end_function(emitter);
 }
 
+/**
+ * The set up required to call a function in assembly
+*/
 void call_function(emitter_t *emitter, struct func *func)
 {
     bool change = align_stack_function(emitter, func->args);
     for (uint16_t i = 0; i < func->args; i++)
     {
-        compile_expression(emitter, func->parameters[func->args - i - 1]);
+        compile_expression(emitter, func->parameters[i]);
     }
     emit_name(emitter, "call %.*s\n", func->name);
-    
+
     for (uint16_t i = 0; i < func->args; i++)
     {
         pop_register(emitter, "rbx");
@@ -86,7 +137,10 @@ void call_function(emitter_t *emitter, struct func *func)
     realign_stack(emitter, change);
 }
 
-void compile_statement(emitter_t *emitter, statement *s)
+/**
+ * This compiles the sattement into assembly
+*/
+void compile_statement(emitter_t *emitter, statement *s, struct declare *declare)
 {
     switch (s->type)
     {
@@ -108,7 +162,7 @@ void compile_statement(emitter_t *emitter, statement *s)
         emit(emitter, "mov $0, %rax");
 
         bool change = align_stack(emitter);
-        emit(emitter, "lea format(%rip),%rdi");
+        emit(emitter, "lea format_(%rip),%rdi");
         emit(emitter, ".extern printf");
         emit(emitter, "call printf");
         realign_stack(emitter, change);
@@ -119,38 +173,57 @@ void compile_statement(emitter_t *emitter, statement *s)
         pop_register(emitter, "rax");
         emit(emitter, "cmp $0, %rax");
         size_t if_number = emit_if_number(emitter);
-        emit_number(emitter, "je else%d", if_number);
+        emit_number(emitter, "je else%d_", if_number);
         for (uint32_t i = 0; i < s->internal->if_statement->size_body; i++)
-            compile_statement(emitter, s->internal->if_statement->body[i]);
+            compile_statement(emitter, s->internal->if_statement->body[i], declare);
         if (s->internal->if_statement->has_else)
         {
-            emit_number(emitter, "jmp endif%d", if_number);
-            emit_number(emitter, "else%d:", if_number);
+            emit_number(emitter, "jmp endif%d_", if_number);
+            emit_number(emitter, "else%d_:", if_number);
             for (uint32_t i = 0; i < s->internal->if_statement->size_else; i++)
-                compile_statement(emitter, s->internal->if_statement->else_body[i]);
-            emit_number(emitter, "endif%d:", if_number);
+                compile_statement(emitter, s->internal->if_statement->else_body[i], declare);
+            emit_number(emitter, "endif%d_:", if_number);
         }
         else
         {
-            emit_number(emitter, "else%d:", if_number);
+            emit_number(emitter, "else%d_:", if_number);
         }
         break;
     }
     case s_while:
     {
         size_t while_number = emit_while_number(emitter);
-        emit_number(emitter, "while%d:", while_number);
+        emit_number(emitter, "while%d_:", while_number);
         compile_expression(emitter, s->internal->while_statement->condition);
         pop_register(emitter, "rax");
         emit(emitter, "cmp $0, %rax");
-        emit_number(emitter, "je endwhile%d", while_number);
+        emit_number(emitter, "je endwhile%d_", while_number);
         for (uint32_t i = 0; i < s->internal->while_statement->size_body; i++)
-            compile_statement(emitter, s->internal->while_statement->body[i]);
-        emit_number(emitter, "jmp while%d", while_number);
-        emit_number(emitter, "endwhile%d:", while_number);
+            compile_statement(emitter, s->internal->while_statement->body[i], declare);
+        emit_number(emitter, "jmp while%d_", while_number);
+        emit_number(emitter, "endwhile%d_:", while_number);
         break;
     }
     case s_return:
+        //If tail end recursion can be used, the compiler will optimizse for it
+        if (s->internal->return_statement->expr->type == t_func && slice_eq2(s->internal->return_statement->expr->character->function->name, declare->name))
+        {
+            for (uint16_t i = 0; i < s->internal->return_statement->expr->character->function->args; i++)
+            {
+                compile_expression(emitter, s->internal->return_statement->expr->character->function->parameters[i]);
+            }
+
+            for (uint16_t i = 0; i < s->internal->return_statement->expr->character->function->args; i++)
+            {
+                pop_register(emitter, "rax");
+                push_variable(emitter, &declare->parameters[declare->args - i - 1], "rax");
+            }
+
+            emit(emitter, "movq %rbp, %rsp");
+            emit(emitter, "popq %rbp");
+            emit_name(emitter, "jmp %.*s\n", declare->name);
+            break;
+        }
         compile_expression(emitter, s->internal->return_statement->expr);
         pop_register(emitter, "rax");
         emit(emitter, "movq %rbp, %rsp");

@@ -58,6 +58,8 @@ void realign_stack(emitter_t *emitter, bool change);
 
 void add_rsp(emitter_t *emitter, int16_t add_map_offset);
 
+void sub_rsp(emitter_t *emitter, int16_t add_map_offset);
+
 void shift_stack(emitter_t *emitter, int16_t offset);
 
 emitter_t* create_emitter();
