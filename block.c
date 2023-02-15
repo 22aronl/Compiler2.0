@@ -815,7 +815,7 @@ void compile_method(emitter_t *emitter, struct declare *declare)
     if (counter > 0)
         shift_stack(emitter, counter);
 
-    for (uint32_t i = 0; i <= method->block_size; i++)
+    for (uint32_t i = 0; i < method->block_size; i++)
     {
         method->blocks[i]->block_label = create_label(emitter);
         if (method->blocks[i]->is_while)
@@ -859,6 +859,7 @@ void compile_method(emitter_t *emitter, struct declare *declare)
         clean_up_block(reg);
         free(reg);
     }
+    emit_number(emitter, "label%d_:", method->blocks[method->block_size]->block_label);
 
     free(method);
 
@@ -870,6 +871,5 @@ void compile_method(emitter_t *emitter, struct declare *declare)
     free(new_map->map);
     free(new_map->visited);
     free(new_map);
-    emit_number(emitter, "label%d_:", method->blocks[method->block_size]->block_label);
     emit_end_function(emitter);
 }
