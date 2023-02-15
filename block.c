@@ -815,7 +815,7 @@ void compile_method(emitter_t *emitter, struct declare *declare)
     if (counter > 0)
         shift_stack(emitter, counter);
 
-    for (uint32_t i = 0; i < method->block_size; i++)
+    for (uint32_t i = 0; i <= method->block_size; i++)
     {
         method->blocks[i]->block_label = create_label(emitter);
         if (method->blocks[i]->is_while)
