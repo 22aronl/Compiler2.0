@@ -198,9 +198,14 @@ void compile_statement(emitter_t *emitter, statement *s, struct declare *declare
             for (uint16_t i = 0; i < s->internal->return_statement->expr->character->function->args; i++)
             {
                 compile_expression(emitter, s->internal->return_statement->expr->character->function->parameters[i]);
+            }
+
+            for (uint16_t i = 0; i < s->internal->return_statement->expr->character->function->args; i++)
+            {
                 pop_register(emitter, "rax");
                 push_variable(emitter, &declare->parameters[i], "rax");
             }
+
             emit(emitter, "movq %rbp, %rsp");
             emit(emitter, "popq %rbp");
             emit_name(emitter, "jmp %.*s\n", declare->name);
