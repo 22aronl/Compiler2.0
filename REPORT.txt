@@ -4,6 +4,8 @@
   * What is the runtime for both versions?
   * Try to explain the difference
 
+  The interpreter took around 55 seconds to run while the compiled version took 590 milliseconds to run.
+
 - Why is it a good idea to "mov $0,%rax" before calling printf?
 
 - Why does my implementation of p3.c use the "-static" gcc flag? Do your best
