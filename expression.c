@@ -13,7 +13,7 @@ expression* preprocess_expression(expression *e)
     switch (e->type)
     {
         case t_not:
-            e = preprocess_expression(e->left);
+            e->left = preprocess_expression(e->left);
             if(e->left->type == t_num)
             {
                 e->character->value = !e->left->character->value;
