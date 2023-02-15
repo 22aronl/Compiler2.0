@@ -104,7 +104,7 @@ block_t **parse_block(statement **body, uint32_t size_body, block_t **blocks, ui
             if (s->type == s_return)
             {
                 add_to_in(exit_block, *block_index - 1);
-                //Seems shoudl be add_to_out
+                // Seems shoudl be add_to_out
             }
             else
             {
@@ -153,18 +153,18 @@ block_t **parse_block(statement **body, uint32_t size_body, block_t **blocks, ui
                     uint32_t current_block = *block_index - 1;
                     blocks[current_block]->has_jump = false;
                     blocks[current_block]->unconditional_jump = true;
-                    //blocks[current_block]->jump_expression = s->internal->while_statement->condition;
-                    // blocks[current_block]->is_while = true;
+                    // blocks[current_block]->jump_expression = s->internal->while_statement->condition;
+                    //  blocks[current_block]->is_while = true;
 
                     blocks = parse_block(s->internal->while_statement->body, s->internal->while_statement->size_body, blocks, block_index, block_size, exit_block);
                     uint32_t while_end = *block_index - 1;
                     uint32_t start_after_while = *block_index;
 
-                    blocks[current_block+1]->jump_expression = s->internal->while_statement->condition;
-                    blocks[current_block+1]->is_while = true;
+                    blocks[current_block + 1]->jump_expression = s->internal->while_statement->condition;
+                    blocks[current_block + 1]->is_while = true;
 
-                    add_to_out(blocks[current_block+1], start_after_while);
-                    add_to_out(blocks[current_block+1], current_block + 2);
+                    add_to_out(blocks[current_block + 1], start_after_while);
+                    add_to_out(blocks[current_block + 1], current_block + 2);
                     add_to_out(blocks[current_block], current_block + 1);
                     add_to_out(blocks[while_end], current_block + 1);
                     blocks[while_end]->has_jump = true;
@@ -385,21 +385,18 @@ void create_next_use_information(block_t *block, struct map *map, struct queue_h
         next_use_statement(s, block, i - 1, queue);
     }
 
-    if (block->variables_index > 0)
-    {
-        block->defined_in_block = malloc(sizeof(bool) * block->variables_index);
-        for (uint32_t i = 0; i < block->variables_index; i++)
-            block->defined_in_block[i] = false;
+    block->defined_in_block = malloc(sizeof(bool) * block->variables_index);
+    for (uint32_t i = 0; i < block->variables_index; i++)
+        block->defined_in_block[i] = false;
 
-        for (uint32_t j = 0; j < block->variables_index; j++)
+    for (uint32_t j = 0; j < block->variables_index; j++)
+    {
+        for (uint32_t k = 0; k < block->variables[j]->index; k++)
         {
-            for (uint32_t k = 0; k < block->variables[j]->index; k++)
+            if (block->variables[j]->vars[k] < 0)
             {
-                if (block->variables[j]->vars[k] < 0)
-                {
-                    block->defined_in_block[j] = true;
-                    break;
-                }
+                block->defined_in_block[j] = true;
+                break;
             }
         }
     }
@@ -819,6 +816,8 @@ void compile_method(emitter_t *emitter, struct declare *declare)
     if (counter > 0)
         shift_stack(emitter, counter);
 
+    
+
     for (uint32_t i = 0; i <= method->block_size; i++)
     {
         method->blocks[i]->block_label = create_label(emitter);
@@ -830,7 +829,7 @@ void compile_method(emitter_t *emitter, struct declare *declare)
     {
         block_t *block = method->blocks[i];
         emit_number(emitter, "label%d_: ", block->block_label);
-        registers_t *reg = declare_register(block, new_map, emitter);
+        registers_t *reg = declare_register(block, new_map, emitter, counter);
 
         if (block->is_while)
         {
@@ -869,7 +868,7 @@ void compile_method(emitter_t *emitter, struct declare *declare)
             }
         }
 
-        clean_up_block(reg); //TODO: this gets skippped D:
+        clean_up_block(reg); // TODO: this gets skippped D:
         free(reg);
     }
     emit_number(emitter, "label%d_:", method->blocks[method->block_size]->block_label);

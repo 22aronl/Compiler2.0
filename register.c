@@ -5,7 +5,7 @@
 #include "slice2.h"
 #include "emitter.h"
 
-registers_t *declare_register(block_t *block, struct map *variable_map, emitter_t *emitter)
+registers_t *declare_register(block_t *block, struct map *variable_map, emitter_t *emitter, uint16_t var_counter)
 {
     registers_t *reg = malloc(sizeof(registers_t));
     reg->variable_map = block->variable_map;
@@ -14,13 +14,13 @@ registers_t *declare_register(block_t *block, struct map *variable_map, emitter_
     {
         reg->registers[i] = -1;
     }
-    reg->variables_index = block->variables_index;
-    reg->name_to_register = malloc(sizeof(int16_t) * block->variables_index);
-    for(uint32_t i = 0; i < block->variables_index; i++) {
+    reg->variables_index = var_counter;
+    reg->name_to_register = malloc(sizeof(int16_t) * var_counter);
+    for(uint32_t i = 0; i < var_counter; i++) {
         reg->name_to_register[i] = -1;
     }
     //memset(reg->name_to_register, -1, sizeof(int16_t) * block->variables_index);
-    reg->name_array = malloc(sizeof(Slice *) * block->variables_index);
+    reg->name_array = malloc(sizeof(Slice *) * var_counter);
 
     reg->variables = block->variables;
     reg->out_blocks_dag = block->out_blocks_dag;

@@ -9,7 +9,7 @@
 
 
 void clean_up_block(registers_t* reg);
-registers_t* declare_register(block_t* block, struct map* variable_map, emitter_t* emitter);
+registers_t* declare_register(block_t* block, struct map* variable_map, emitter_t* emitter, uint16_t counter);
 uint16_t available_registers(registers_t* reg, uint32_t statement_index);
 int32_t is_in_register(registers_t *reg, Slice* name);
 int16_t get_reg(registers_t *reg, Slice *name);
