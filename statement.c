@@ -200,7 +200,7 @@ void compile_statement(emitter_t *emitter, statement *s, struct declare *declare
                 compile_expression(emitter, s->internal->return_statement->expr->character->function->parameters[i]);
             }
 
-            for (uint16_t i = 0; i < s->internal->return_statement->expr->character->function->args; i++)
+            for (uint16_t i =  s->internal->return_statement->expr->character->function->args + 1; i > 0; i--)
             {
                 pop_register(emitter, "rax");
                 push_variable(emitter, &declare->parameters[i], "rax");
