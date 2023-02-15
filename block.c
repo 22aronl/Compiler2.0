@@ -159,10 +159,10 @@ block_t **parse_block(statement **body, uint32_t size_body, block_t **blocks, ui
                     uint32_t while_end = *block_index - 1;
                     uint32_t start_after_while = *block_index;
 
-                    blocks[current_block]->has_jump = true;
-                    blocks[current_block]->unconditional_jump = false;
-                    blocks[current_block]->jump_expression = s->internal->while_statement->condition;
-                    blocks[current_block]->is_while = true;
+                    blocks[current_block+1]->has_jump = true;
+                    blocks[current_block+1]->unconditional_jump = false;
+                    blocks[current_block+1]->jump_expression = s->internal->while_statement->condition;
+                    blocks[current_block+1]->is_while = true;
 
                     add_to_out(blocks[current_block], start_after_while);
                     add_to_out(blocks[current_block], current_block + 1);
@@ -869,7 +869,7 @@ void compile_method(emitter_t *emitter, struct declare *declare)
             }
         }
 
-        clean_up_block(reg);
+        clean_up_block(reg); //TODO: this gets skippped D:
         free(reg);
     }
     emit_number(emitter, "label%d_:", method->blocks[method->block_size]->block_label);
