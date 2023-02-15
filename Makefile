@@ -26,7 +26,7 @@ ${TEST_S} : %.s : Makefile ${PROG} %.fun
 	./p3 < $*.fun > $*.s
 
 ${TEST_RUNS} : %.run : Makefile %.s
-	gcc -g -o $*.run  $*.s
+	gcc -g -o $*.run -static $*.s
 
 ${TEST_OUTS} : %.out : Makefile %.run
 	@echo "failed to run" > $*.out
