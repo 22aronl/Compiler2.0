@@ -207,6 +207,7 @@ method_t *parse_method(struct declare *declare)
     exit_block->in_blocks_size = 2;
     exit_block->statement_size = 0;
     exit_block->has_jump = false;
+    exit_block->variables_index = 0;
 
     block_t **blocks = malloc(sizeof(block_t *) * 2);
     uint32_t block_size = 2;
@@ -220,7 +221,8 @@ method_t *parse_method(struct declare *declare)
     blocks[0]->out_blocks_index = 0;
     blocks[0]->out_blocks_size = 2;
     blocks[0]->unconditional_jump = true;
-    blocks[0]->has_jump = true;
+    blocks[0]->has_jump = false;
+    blocks[0]->is_while = false;
     blocks[0]->statement_size = 0;
 
     blocks = parse_block(declare->body, declare->size_body, blocks, &block_index, &block_size, exit_block);
@@ -439,7 +441,6 @@ void live_variable_analysis(method_t *method)
 
     while (true)
     {
-        block_t *blocks = method->blocks[start_queue->block_index];
 
         for (uint32_t i = 0; i < blocks->variables_index; i++)
         {
