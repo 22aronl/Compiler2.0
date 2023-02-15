@@ -441,7 +441,7 @@ void live_variable_analysis(method_t *method)
 
     while (true)
     {
-
+        block_t *blocks = method->blocks[start_queue->block_index];
         for (uint32_t i = 0; i < blocks->variables_index; i++)
         {
             struct var_bin *var = blocks->variables[i];
