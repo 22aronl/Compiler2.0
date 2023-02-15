@@ -16,7 +16,10 @@ registers_t *declare_register(block_t *block, struct map *variable_map, emitter_
     }
     reg->variables_index = block->variables_index;
     reg->name_to_register = malloc(sizeof(int16_t) * block->variables_index);
-    memset(reg->name_to_register, -1, sizeof(int16_t) * block->variables_index);
+    for(uint32_t i = 0; i < block->variables_index; i++) {
+        reg->name_to_register[i] = -1;
+    }
+    //memset(reg->name_to_register, -1, sizeof(int16_t) * block->variables_index);
     reg->name_array = malloc(sizeof(Slice *) * block->variables_index);
 
     reg->variables = block->variables;
@@ -49,6 +52,18 @@ bool is_register_needed(registers_t *reg, int16_t statement_index, uint16_t vari
 void return_register_to_memory(registers_t *reg, uint16_t i)
 {
     push_variable(reg->emitter, reg->name_array[reg->registers[i]], reg->emitter->registers[i]);
+}
+
+void clean_up_registers(registers_t*reg)
+{
+    for (uint16_t i = 0; i < REGISTER_SIZE; i++)
+    {
+        if (reg->registers[i] != -1)
+        //if (reg->registers[i] != -1 && reg->out_blocks_dag[reg->registers[i]]) //TODO:: REPLACEEEE!!!
+        {
+            return_register_to_memory(reg, i);
+        }
+    }
 }
 
 void clean_up_block(registers_t *reg)
