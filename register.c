@@ -55,13 +55,18 @@ void clean_up_block(registers_t *reg)
 {
     for (uint16_t i = 0; i < REGISTER_SIZE; i++)
     {
-        //if (reg->registers[i] != -1)
-        if (reg->registers[i] != -1 && reg->out_blocks_dag[reg->registers[i]]) //TODO:: REPLACEEEE!!!
+        if (reg->registers[i] != -1)
+        //if (reg->registers[i] != -1 && reg->out_blocks_dag[reg->registers[i]]) //TODO:: REPLACEEEE!!!
         {
             reg->name_to_register[reg->registers[i]] = -1;
             return_register_to_memory(reg, i);
             reg->registers[i] = -1;
         }
+    }
+
+    for (uint16_t i = 0; i < reg->variables_index; i++)
+    {
+        reg->name_to_register[i] = -1;
     }
 }
 
@@ -122,7 +127,7 @@ void set_reg(registers_t *regs, Slice *name, int16_t reg)
 int16_t get_reg(registers_t *reg, Slice *name)
 {
     int32_t name_id = get_map_offset(reg->variable_map, name);
-
+    //should use get_map_offset2
     if (reg->name_to_register[name_id] != -1)
     {
         return reg->name_to_register[name_id];
