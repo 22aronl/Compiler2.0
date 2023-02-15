@@ -675,7 +675,7 @@ void print_instruction(emitter_t *emitter, uint16_t register_index, registers_t 
         move_instruction(emitter, 11, register_index);
     if (reg->registers[12] != -1)
         return_register_to_memory(reg, 12);
-    emit_reg_to_reg(emitter, "mov %%%s, %%%s", emitter->registers[register_index], "rax");
+    emit_reg_to_reg(emitter, "mov %%%s, %%%s", emitter->registers[register_index], "rsi");
     emit(emitter, "mov $0, %rax");
     emit(emitter, "lea format(%rip),%rdi");
     emit(emitter, ".extern printf");
