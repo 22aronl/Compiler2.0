@@ -861,7 +861,7 @@ void compile_method(emitter_t *emitter, struct declare *declare)
             else
             {
                 if (block->is_while)
-                    emit_number(emitter, "jmp label%d_", method->blocks[block->out_blocks[0]]->block_label);
+                    emit_number(emitter, "jmp label%d_", method->blocks[block->out_blocks[1]]->block_label);
                 else
                     emit_number(emitter, "jmp label%d_", method->blocks[block->out_blocks[0]]->block_label);
             }
