@@ -1,6 +1,18 @@
 #include <stdio.h>
-
+#include <string.h>
 #include "emitter.h"
+
+void force_reg_write(emitter_t *emitter)
+{
+    if (emitter->emit_instruction->in_use)
+    {
+        if (emitter->emit_instruction->pop)
+            printf("popq %%%s", emitter->emit_instruction->reg);
+        else
+            printf("pushq %%%s", emitter->emit_instruction->reg);
+        emitter->emit_instruction->in_use = false;
+    }
+}
 
 void sub_rsp(emitter_t *emitter)
 {
@@ -16,6 +28,7 @@ bool align_stack(emitter_t *emitter)
 {
     if (emitter->stack_pointer % 16 != 0)
     {
+        force_reg_write(emitter);
         printf("subq $8, %%rsp\n");
         sub_rsp(emitter);
         return true;
@@ -27,6 +40,7 @@ bool align_stack_function(emitter_t *emitter, int16_t offset)
 {
     if ((emitter->stack_pointer + offset * 8) % 16 != 0)
     {
+        force_reg_write(emitter);
         printf("subq $8, %%rsp\n");
         sub_rsp(emitter);
         return true;
@@ -38,6 +52,7 @@ void realign_stack(emitter_t *emitter, bool change)
 {
     if (change)
     {
+        force_reg_write(emitter);
         printf("addq $8, %%rsp\n");
         add_rsp(emitter);
     }
@@ -45,23 +60,53 @@ void realign_stack(emitter_t *emitter, bool change)
 
 void push_register(emitter_t *emitter, char *name)
 {
-    printf("pushq %%%s\n", name);
+    if (emitter->emit_instruction->in_use)
+    {
+        if (!strcmp(emitter->emit_instruction->reg, name) && emitter->emit_instruction->pop)
+            emitter->emit_instruction->in_use = false;
+        else
+        {
+            emitter->emit_instruction->pop = false;
+            emitter->emit_instruction->reg = name;
+            printf("pushq %%%s", name);
+        }
+    }
+    else
+    {
+        printf("pushq %%%s\n", name);
+    }
     sub_rsp(emitter);
 }
 
 void pop_register(emitter_t *emitter, char *name)
 {
-    printf("popq %%%s\n", name);
+    if (emitter->emit_instruction->in_use)
+    {
+        if (!strcmp(emitter->emit_instruction->reg, name) && !emitter->emit_instruction->pop)
+            emitter->emit_instruction->in_use = false;
+        else
+        {
+            emitter->emit_instruction->pop = true;
+            emitter->emit_instruction->reg = name;
+            printf("popq %%%s\n", name);
+        }
+    }
+    else
+    {
+        printf("popq %%%s\n", name);
+    }
     add_rsp(emitter);
 }
 
 void emit(emitter_t *emitter, char *instruction)
 {
+    force_reg_write(emitter);
     printf("%s\n", instruction);
 }
 
 void emit_number(emitter_t *emitter, char *instruction, uint64_t number)
 {
+    force_reg_write(emitter);
     printf(instruction, number);
     printf("\n");
 }
@@ -71,6 +116,7 @@ int32_t get_offset(emitter_t *emitter, Slice *var)
     int32_t offset = get_map_offset(emitter->var_map, var);
     if (offset == 0)
     {
+        force_reg_write(emitter);
         offset = -(emitter->var_offset++) * 8;
         declare_variable(emitter, var, offset);
         emit(emitter, "sub $8, %rsp");
@@ -81,6 +127,7 @@ int32_t get_offset(emitter_t *emitter, Slice *var)
 
 void push_variable(emitter_t *emitter, Slice *var, char *reg)
 {
+    force_reg_write(emitter);
     printf("movq %%%s, %d(%%rbp)\n", reg, get_offset(emitter, var));
 }
 
@@ -116,11 +163,13 @@ void declare_variable(emitter_t *emitter, Slice *var, int16_t index)
 
 void emit_name(emitter_t *emitter, char *instruction, Slice *name)
 {
+    force_reg_write(emitter);
     printf(instruction, name->len, name->start);
 }
 
 void emit_string(emitter_t *emitter, char *instruction, char *string)
 {
+    force_reg_write(emitter);
     printf(instruction, string);
 }
 

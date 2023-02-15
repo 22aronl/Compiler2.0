@@ -28,12 +28,21 @@ typedef struct function_table
     struct declare* bins;
 } hash_map_func;
 
+//for minor peephole optimization
+struct emit_instruction
+{
+    bool in_use;
+    char* reg;
+    bool pop;
+};
+
 typedef struct {
     struct map* var_map;
     size_t stack_pointer;
     size_t if_count;
     size_t while_count;
     uint16_t var_offset;
+    struct emit_instruction* emit_instruction;
 } emitter_t;
 
 typedef struct

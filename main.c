@@ -675,6 +675,8 @@ void run_compile(Interpreter *in)
     em->if_count = 0;
     em->while_count = 0;
     em->stack_pointer = 0;
+    em->emit_instruction = malloc(sizeof(struct emit_instruction));
+    em->emit_instruction->in_use = false;
     bool continue_parsing = true;
     // struct map map = {in->symbol_table, in->visited, MAX_SYMBOLS, true};
     // uint64_t return_value = 0;
@@ -692,6 +694,7 @@ void run_compile(Interpreter *in)
     }
 
     // frees all the memory
+    free(em->emit_instruction);
     free(em);
     clear_ast(in);
     free_interpreter_internal(in);
