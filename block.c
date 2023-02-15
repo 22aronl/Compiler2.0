@@ -499,7 +499,7 @@ void generate_variable(emitter_t *emitter, registers_t *regs, Slice *name, uint1
     }
     else
     {
-        // TODO: Check that the variable doesn't need to moved and change it
+        // TODO: Check that the variable doesn't need to moved and change its original location
         move_instruction(emitter, reg, base);
     }
 }
@@ -654,6 +654,7 @@ uint16_t generate_expression(emitter_t *emitter, expression *expr, uint32_t stat
     reg->functions_stack = old_functions_stack;
     reg->functions_counter = old_functions_counter;
 
+    printf("SHIFTING STACK");
     shift_stack(emitter, compile_expr.index);
 
     return output_register;
@@ -703,6 +704,7 @@ void compile_statement_in_block(emitter_t *emitter, statement *stmt, registers_t
     {
     case s_var:
     {
+        printf("settign Reg");
         uint16_t register_index = generate_expression(emitter, stmt->internal->var->expr, statement_index, block, regs);
         set_reg(regs, stmt->internal->var->name, register_index);
         break;
