@@ -837,6 +837,7 @@ void compile_method(emitter_t *emitter, struct declare *declare)
             // think about more later
             move_output_instruction(emitter, register_index, "rax");
             emit(emitter, "cmp $0, %rax");
+            clean_up_registers(reg);
             emit_number(emitter, "je label%d_", method->blocks[block->out_blocks[0]]->block_label);
         }
 
@@ -857,10 +858,12 @@ void compile_method(emitter_t *emitter, struct declare *declare)
                 // think about more later
                 move_output_instruction(emitter, register_index, "rax");
                 emit(emitter, "cmp $0, %rax");
+                clean_up_registers(reg);
                 emit_number(emitter, "je label%d_", method->blocks[block->out_blocks[0]]->block_label);
             }
             else
             {
+                clean_up_registers(reg);
                 if (block->is_while)
                     emit_number(emitter, "jmp label%d_", method->blocks[block->out_blocks[1]]->block_label);
                 else
