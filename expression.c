@@ -13,14 +13,15 @@ expression* preprocess_expression(expression *e)
     switch (e->type)
     {
         case t_not:
-            e->left = preprocess_expression(e->left);
-            if(e->left->type == t_num)
-            {
-                e->character = malloc(sizeof(character));
-                e->character->value = !e->left->character->value;
-                free_expression(e->left);
-                e->type = t_num;
-            }
+            // e->left = preprocess_expression(e->left);
+            // if(e->left->type == t_num)
+            // {
+            //     e->character = malloc(sizeof(character));
+            //     e->character->value = !e->left->character->value;
+            //     free_expression(e->left);
+            //     e->type = t_num;
+            // }
+            //TODO: FIx this for some reason
             return e;
         case t_num:
         case t_var:
