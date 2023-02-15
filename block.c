@@ -693,6 +693,7 @@ void function_call_statement(emitter_t *emitter, struct func *func, registers_t 
     }
     clean_up_block(regs);
     emit_name(emitter, "call %.*s\n", func->name);
+    shift_stack(emitter, -func->args);
     realign_stack(emitter, change);
 }
 
