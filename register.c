@@ -46,7 +46,6 @@ bool is_register_needed(registers_t *reg, int16_t statement_index, uint16_t vari
     return false;
 }
 
-
 void return_register_to_memory(registers_t *reg, uint16_t i)
 {
     push_variable(reg->emitter, reg->name_array[reg->registers[i]], reg->emitter->registers[i]);
@@ -57,8 +56,9 @@ void clean_up_block(registers_t *reg)
     for (uint16_t i = 0; i < REGISTER_SIZE; i++)
     {
         if (reg->registers[i] != -1)
-        //if (reg->registers[i] != -1 && reg->out_blocks_dag[reg->registers[i]]) //TODO:: REPLACEEEE!!!
+        // if (reg->registers[i] != -1 && reg->out_blocks_dag[reg->registers[i]]) //TODO:: REPLACEEEE!!!
         {
+            reg->name_to_register[reg->registers[i]] = -1;
             return_register_to_memory(reg, i);
             reg->registers[i] = -1;
         }
@@ -89,8 +89,9 @@ uint16_t available_registers(registers_t *reg, uint32_t statement_index)
         else if (!is_register_needed(reg, statement_index, reg->registers[i]))
         {
             // reg->registers[i] = -1;
+            reg->name_to_register[reg->registers[i]] = -1;
             reg->registers[i] = -1;
-            //return_register_to_memory(reg, i);
+            // return_register_to_memory(reg, i);
             k++;
         }
     }
