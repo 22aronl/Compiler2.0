@@ -474,12 +474,15 @@ void create_function_stack(emitter_t *emitter, struct compile_expr *com_expr, re
 
 void move_instruction(emitter_t *emitter, uint16_t src, uint16_t dest)
 {
-    emit_reg_to_reg(emitter, "movq %%%s, %%%s", emitter->registers[src], emitter->registers[dest]);
+    if (src != dest)
+        emit_reg_to_reg(emitter, "movq %%%s, %%%s", emitter->registers[src], emitter->registers[dest]);
 }
 
 void move_output_instruction(emitter_t *emitter, uint16_t src, char *dest)
 {
-    emit_reg_to_reg(emitter, "movq %%%s, %%%s", emitter->registers[src], dest);
+    //code for comparing two char ararys
+    if (strcmp(emitter->registers[src], dest) != 0)
+        emit_reg_to_reg(emitter, "movq %%%s, %%%s", emitter->registers[src], dest);
 }
 
 void generate_function(emitter_t *emitter, registers_t *regs, uint16_t base)
@@ -497,8 +500,7 @@ void generate_variable(emitter_t *emitter, registers_t *regs, Slice *name, uint1
     else
     {
         // TODO: Check that the variable doesn't need to moved and change it
-        if (reg != base)
-            move_instruction(emitter, reg, base);
+        move_instruction(emitter, reg, base);
     }
 }
 
