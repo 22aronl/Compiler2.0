@@ -865,13 +865,13 @@ void compile_method(emitter_t *emitter, struct declare *declare)
             {
                 clean_up_registers(reg);
                 if (block->is_while)
-                    emit_number(emitter, "jmp label%d_", method->blocks[block->out_blocks[1]]->block_label);
+                    emit_number(emitter, "jmp label%d_", method->blocks[block->out_blocks[0]]->block_label);
                 else
                     emit_number(emitter, "jmp label%d_", method->blocks[block->out_blocks[0]]->block_label);
             }
         }
+        clean_up_block(reg);//CHANGE TODO:
 
-        clean_up_block(reg); // TODO: this gets skippped D:
         free(reg);
     }
     emit_number(emitter, "label%d_:", method->blocks[method->block_size]->block_label);
