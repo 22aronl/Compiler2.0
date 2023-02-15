@@ -529,7 +529,7 @@ void generate_instruction(emitter_t *emitter, registers_t *regs, enum type_of ty
         emit_reg_to_reg(emitter, "subq %%%s, %%%s", emitter->registers[src], emitter->registers[dest]);
         break;
     case t_l:
-        emit_reg_to_reg(emitter, "cmp %%%s, %%%s", emitter->registers[src], emitter->registers[dest]);
+        emit_reg_to_reg(emitter, "cmp %%%s, %%%s", emitter->registers[dest], emitter->registers[src]);
         emit(emitter, "setb \%al");
         emit_reg_to_reg(emitter, "movzbq %%%s, %%%s", "al", emitter->registers[dest]);
         break;
