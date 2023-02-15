@@ -221,8 +221,6 @@ method_t *parse_method(struct declare *declare)
     queue->head = qhead;
     queue->tail = qhead;
 
-
-
     for (uint32_t i = 0; i < block_index; i++)
     {
         for (uint32_t j = 0; j < blocks[i]->out_blocks_index; j++)
@@ -491,7 +489,7 @@ void move_instruction(emitter_t *emitter, uint16_t src, uint16_t dest)
 
 void move_output_instruction(emitter_t *emitter, uint16_t src, char *dest)
 {
-    //code for comparing two char ararys
+    // code for comparing two char ararys
     if (strcmp(emitter->registers[src], dest) != 0)
         emit_reg_to_reg(emitter, "movq %%%s, %%%s", emitter->registers[src], dest);
 }
@@ -529,6 +527,11 @@ void generate_instruction(emitter_t *emitter, registers_t *regs, enum type_of ty
         break;
     case t_minus:
         emit_reg_to_reg(emitter, "subq %%%s, %%%s", emitter->registers[src], emitter->registers[dest]);
+        break;
+    case t_l:
+        emit_reg_to_reg(emitter, "cmp %%%s, %%%s", emitter->registers[src], emitter->registers[dest]);
+        emit(emitter, "setb \%al");
+        emit_reg_to_reg(emitter, "movzbq %%%s, %%%s", "al", emitter->registers[dest]);
         break;
     default:
         emit(emitter, "ERROR: Not implemented");
