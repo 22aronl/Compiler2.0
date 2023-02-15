@@ -56,8 +56,8 @@ void clean_up_block(registers_t *reg)
 {
     for (uint16_t i = 0; i < REGISTER_SIZE; i++)
     {
-        //if (reg->registers[i] != -1)
-        if (reg->registers[i] != -1 && reg->out_blocks_dag[reg->registers[i]]) //TODO:: REPLACEEEE!!!
+        if (reg->registers[i] != -1)
+        //if (reg->registers[i] != -1 && reg->out_blocks_dag[reg->registers[i]]) //TODO:: REPLACEEEE!!!
         {
             return_register_to_memory(reg, i);
             reg->registers[i] = -1;
