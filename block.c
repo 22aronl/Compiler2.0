@@ -159,8 +159,6 @@ block_t **parse_block(statement **body, uint32_t size_body, block_t **blocks, ui
                     uint32_t while_end = *block_index - 1;
                     uint32_t start_after_while = *block_index;
 
-                    blocks[current_block+1]->has_jump = true;
-                    blocks[current_block+1]->unconditional_jump = false;
                     blocks[current_block+1]->jump_expression = s->internal->while_statement->condition;
                     blocks[current_block+1]->is_while = true;
 
@@ -838,7 +836,7 @@ void compile_method(emitter_t *emitter, struct declare *declare)
             // think about more later
             move_output_instruction(emitter, register_index, "rax");
             emit(emitter, "cmp $0, %rax");
-            emit_number(emitter, "je label%d_", method->blocks[block->out_blocks[0]]->block_label);
+            emit_number(emitter, "je label%d_", method->blocks[block->out_blocks[1]]->block_label);
         }
 
         for (uint32_t j = 0; j < block->statement_size; j++)
@@ -858,7 +856,7 @@ void compile_method(emitter_t *emitter, struct declare *declare)
                 // think about more later
                 move_output_instruction(emitter, register_index, "rax");
                 emit(emitter, "cmp $0, %rax");
-                emit_number(emitter, "je label%d_", method->blocks[block->out_blocks[1]]->block_label);
+                emit_number(emitter, "je label%d_", method->blocks[block->out_blocks[0]]->block_label);
             }
             else
             {
