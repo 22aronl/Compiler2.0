@@ -8,19 +8,14 @@
 #include "statement.h"
 #include "emitter.h"
 
+/**
+ * This preprocesses the expression by removing any literals that it can
+*/
 expression* preprocess_expression(expression *e)
 {
     switch (e->type)
     {
         case t_not:
-            // e->left = preprocess_expression(e->left);
-            // if(e->left->type == t_num)
-            // {
-            //     e->character = malloc(sizeof(character));
-            //     e->character->value = !e->left->character->value;
-            //     free_expression(e->left);
-            //     e->type = t_num;
-            // }
             //TODO: FIx this for some reason
             return e;
         case t_num:
@@ -47,6 +42,9 @@ expression* preprocess_expression(expression *e)
     //TODO: add more cases
 }
 
+/**
+ * This compiles the expression into assembly through recursion, its values are then stroed onto the top of the stack
+*/
 void compile_expression(emitter_t *emitter, expression *e)
 {
     switch (e->type)

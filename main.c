@@ -20,7 +20,7 @@ expression *parse_expression(Interpreter *in);
 statement *parse_statement(Interpreter *in, bool *effects);
 
 /**
- * creates an interpreter
+ * creates an interpreter for the program using a given string
  */
 Interpreter createInterpreter(char *program)
 {
@@ -194,7 +194,7 @@ Slice *parse_args(Interpreter *in, Slice *args, uint16_t *num_args)
     }
     do
     {
-        if (args_size == args_capacity)
+        if (args_size == args_capacity) // double the size of the array if it is full
         {
             args_capacity *= 2;
             args = realloc(args, args_capacity * sizeof(Slice));
@@ -270,7 +270,7 @@ expression *parse_value(Interpreter *in)
             }
             else // otherwise its a normal function
             {
-                if (slice_eq(sl, "printf"))
+                if (slice_eq(sl, "printf")) // mangling printf so it doesn't mess with the extern printf
                 {
                     free(sl);
                     sl = slice_construct("printf_", 7);
@@ -301,6 +301,9 @@ expression *parse_value(Interpreter *in)
     return expr;
 }
 
+/**
+ * Parses an expression that has a not operator
+ */
 expression *parse_not_expr(Interpreter *in)
 {
     if (consume(in, "!"))
@@ -533,7 +536,7 @@ statement *parse_statement(Interpreter *in, bool *continue_parsing)
     else if (eat(in, "fun"))
     {
         Slice *name = consume_token(in);
-        if (slice_eq(name, "printf"))
+        if (slice_eq(name, "printf")) // mangle printf
         {
             free(name);
             name = slice_construct("printf_", 7);
@@ -541,11 +544,13 @@ statement *parse_statement(Interpreter *in, bool *continue_parsing)
         consume_or_fail(in, "(");
         Slice *args = malloc(sizeof(Slice));
         uint16_t args_size = 0;
-        args = parse_args(in, args, &args_size);
+        args = parse_args(in, args, &args_size); // parses the arguments
         consume_or_fail(in, "{");
+
         statement **body = malloc(sizeof(statement **));
         uint32_t body_size = 0;
-        body = parse_body(in, body, &body_size);
+        body = parse_body(in, body, &body_size); // parse the body of the function
+
         struct declare *declare = malloc(sizeof(struct declare));
         declare->name = name;
         declare->parameters = args;
@@ -589,7 +594,7 @@ statement *parse_statement(Interpreter *in, bool *continue_parsing)
                     free(name);
                     name = slice_construct("printf_", 7);
                 }
-                expression **args = malloc(sizeof(expression *));
+                expression **args = malloc(sizeof(expression *)); // this is a function call
                 uint16_t args_size = 0;
                 args = parse_args2(in, args, &args_size);
                 struct func *func = malloc(sizeof(struct func));
@@ -603,7 +608,7 @@ statement *parse_statement(Interpreter *in, bool *continue_parsing)
         }
         else
         {
-            consume_or_fail(in, "="); // statement is assignemtn
+            consume_or_fail(in, "="); // statement is variable assignemtn
             expression *expr = parse_expression(in);
             struct var *var = malloc(sizeof(struct var));
             var->name = name;
@@ -669,6 +674,9 @@ void free_interpreter_internal(Interpreter *in)
     free(in->function_table);
 }
 
+/**
+ * Runs the compiled version of the code, outputs to x86 assembly
+ */
 void run_compile(Interpreter *in)
 {
     emitter_t *em = malloc(sizeof(emitter_t));
@@ -701,6 +709,9 @@ void run_compile(Interpreter *in)
     end_or_fail(in);
 }
 
+/**
+ * This runs the interpreted version of the compiled code
+ */
 void run(Interpreter *in)
 {
     bool continue_parsing = true;
@@ -726,22 +737,9 @@ void run(Interpreter *in)
 int main(int argc, const char *const *const argv)
 {
 
-    // // map the file in my address space
-    // char const *prog = (char const *)mmap(
-    //     0,
-    //     file_stats.st_size,
-    //     PROT_READ,
-    //     MAP_PRIVATE,
-    //     fd,
-    //     0);
-    // if (prog == MAP_FAILED)
-    // {
-    //     perror("mmap");
-    //     exit(1);
-    // }
-
-    char *input = malloc(sizeof(char) * 2);
-    size_t input_size = 2;
+    // Takes in the input from standard input
+    char *input = malloc(sizeof(char) * 100);
+    size_t input_size = 100;
     size_t input_len = 0;
 
     int ch;
@@ -771,17 +769,14 @@ int main(int argc, const char *const *const argv)
     }
     input[input_len] = '\0';
 
+    //This just allows for intepretation of in the input
     Interpreter x = createInterpreter(input);
 
-    // run(&x);
+    // This is the interpreted version of the code
+    //  run(&x);
 
+    // Run the compiled version of the code
     run_compile(&x);
-    // if (input_len == 0)
-    // {
-    //     puts("main:");
-    //     puts("movq $0, %rax");
-    //     puts("retq");
-    // }
     free(input);
 
     return 0;

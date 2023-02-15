@@ -36,6 +36,9 @@ void free_map(struct map *map)
     }
 }
 
+/**
+ * This finds all hte variables in the statement
+*/
 void find_variables(emitter_t *emitter, statement *s)
 {
     if (s->type == s_var)
@@ -73,6 +76,9 @@ void find_variables(emitter_t *emitter, statement *s)
     }
 }
 
+/**
+ * This is the code for declaring a new function in the assembly
+*/
 void declare_function(emitter_t *emitter, struct declare *declare)
 {
 
@@ -112,6 +118,9 @@ void declare_function(emitter_t *emitter, struct declare *declare)
     emit_end_function(emitter);
 }
 
+/**
+ * The set up required to call a function in assembly
+*/
 void call_function(emitter_t *emitter, struct func *func)
 {
     bool change = align_stack_function(emitter, func->args);
@@ -128,6 +137,9 @@ void call_function(emitter_t *emitter, struct func *func)
     realign_stack(emitter, change);
 }
 
+/**
+ * This compiles the sattement into assembly
+*/
 void compile_statement(emitter_t *emitter, statement *s, struct declare *declare)
 {
     switch (s->type)
@@ -193,6 +205,7 @@ void compile_statement(emitter_t *emitter, statement *s, struct declare *declare
         break;
     }
     case s_return:
+        //If tail end recursion can be used, the compiler will optimizse for it
         if (s->internal->return_statement->expr->type == t_func && slice_eq2(s->internal->return_statement->expr->character->function->name, declare->name))
         {
             for (uint16_t i = 0; i < s->internal->return_statement->expr->character->function->args; i++)

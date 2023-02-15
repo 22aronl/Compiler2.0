@@ -7,6 +7,9 @@
 #include "main.h"
 #include "statement.h"
 
+/**
+ * This gets the offset that the slice is from the rbp stored on the hashmap, returns 0 if the variable does not exist
+*/
 int32_t get_map_offset(struct map* map, Slice* key) {
     bool* visited = map->visited;
     hash_map* symbol_table = map->map;
@@ -26,15 +29,17 @@ int32_t get_map_offset(struct map* map, Slice* key) {
     return 0;
 }
 
+/**
+ * This adds the offset that the variable is stored at to the hashmap
+*/
 void add_map_offset(struct map* map, Slice* key, int32_t value) {
 
     bool *visited = map->visited;
     hash_map *symbol_table = map->map;
     uint32_t size = map->size;
-
-
     int hash = sliceHash(key) % size;
-    if (visited[hash])
+
+    if (visited[hash]) //if the bin has already been created
     {
         struct symbol_table *table = &symbol_table[hash];
         for (int i = 0; i < table->cur; i++)
@@ -56,7 +61,7 @@ void add_map_offset(struct map* map, Slice* key, int32_t value) {
         table->cur += 1;
     }
     else
-    {
+    {   //create a new bin
         visited[hash] = true;
         symbol_table[hash].size = 2;
         symbol_table[hash].cur = 1;
