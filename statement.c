@@ -199,7 +199,7 @@ void compile_statement(emitter_t *emitter, statement *s, struct declare *declare
             {
                 compile_expression(emitter, s->internal->return_statement->expr->character->function->parameters[i]);
                 pop_register(emitter, "rax");
-                push_variable(emitter, declare->parameters[i], "rax");
+                push_variable(emitter, &declare->parameters[i], "rax");
             }
             emit(emitter, "movq %rbp, %rsp");
             emit(emitter, "popq %rbp");
