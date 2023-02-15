@@ -681,13 +681,13 @@ void print_instruction(emitter_t *emitter, uint16_t register_index, registers_t 
 
 void function_call_statement(emitter_t *emitter, struct func *func, registers_t *regs, block_t *block, uint32_t statement_index)
 {
+    bool change = align_stack(emitter);
     for (int i = 0; i < func->args; i++)
     {
         uint16_t register_index = generate_expression(emitter, func->parameters[i], statement_index, block, regs);
         push_register(emitter, emitter->registers[register_index]);
     }
     clean_up_block(regs);
-    bool change = align_stack(emitter);
     emit_name(emitter, "call %.*s\n", func->name);
     realign_stack(emitter, change);
 }
