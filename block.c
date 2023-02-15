@@ -654,7 +654,6 @@ uint16_t generate_expression(emitter_t *emitter, expression *expr, uint32_t stat
     reg->functions_stack = old_functions_stack;
     reg->functions_counter = old_functions_counter;
 
-    printf("SHIFTING STACK");
     shift_stack(emitter, compile_expr.index);
 
     return output_register;
@@ -676,7 +675,7 @@ void print_instruction(emitter_t *emitter, uint16_t register_index, registers_t 
         move_instruction(emitter, 11, register_index);
     if (reg->registers[12] != -1)
         return_register_to_memory(reg, 12);
-    emit(emitter, "mov %rax, %rsi");
+    emit_reg_to_reg(emitter, "mov %%%s, %%%s", emitter->registers[register_index], "rax");
     emit(emitter, "mov $0, %rax");
     emit(emitter, "lea format(%rip),%rdi");
     emit(emitter, ".extern printf");
@@ -704,7 +703,6 @@ void compile_statement_in_block(emitter_t *emitter, statement *stmt, registers_t
     {
     case s_var:
     {
-        printf("settign Reg");
         uint16_t register_index = generate_expression(emitter, stmt->internal->var->expr, statement_index, block, regs);
         set_reg(regs, stmt->internal->var->name, register_index);
         break;
