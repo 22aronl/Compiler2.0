@@ -162,7 +162,7 @@ block_t **parse_block(statement **body, uint32_t size_body, block_t **blocks, ui
                     blocks[current_block+1]->jump_expression = s->internal->while_statement->condition;
                     blocks[current_block+1]->is_while = true;
 
-                    add_to_out(blocks[current_block], start_after_while);
+                    add_to_out(blocks[current_block+1], start_after_while);
                     add_to_out(blocks[current_block], current_block + 1);
                     add_to_out(blocks[while_end], current_block + 1);
                     blocks[while_end]->has_jump = true;
