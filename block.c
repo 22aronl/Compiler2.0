@@ -204,6 +204,15 @@ method_t *parse_method(struct declare *declare)
     blocks[0]->statement_size = 0;
 
     blocks = parse_block(declare->body, declare->size_body, blocks, &block_index, &block_size, exit_block);
+
+    if (block_index == block_size)
+    {
+        block_size *= 2;
+        blocks = realloc(blocks, sizeof(block_t *) * block_size);
+    }
+
+    blocks[block_index] = exit_block;
+
     struct queue_name *qhead = malloc(sizeof(struct queue_name));
     qhead->next = NULL;
     qhead->name = NULL;
@@ -211,6 +220,8 @@ method_t *parse_method(struct declare *declare)
     struct queue_head *queue = malloc(sizeof(struct queue_head));
     queue->head = qhead;
     queue->tail = qhead;
+
+
 
     for (uint32_t i = 0; i < block_index; i++)
     {
