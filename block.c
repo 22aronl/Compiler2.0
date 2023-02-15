@@ -39,7 +39,6 @@ block_t **add_new_block(block_t **blocks, uint32_t *block_index, uint32_t *block
     blocks[*block_index]->in_blocks_size = 2;
     blocks[*block_index]->is_while = false;
 
-
     (*block_index)++;
 
     return blocks;
@@ -466,7 +465,9 @@ void create_function_stack(emitter_t *emitter, struct compile_expr *com_expr, re
 {
     for (uint16_t i = 0; i < com_expr->index; i++)
     {
+
         function_call_statement(emitter, com_expr->function[i]->function, regs, NULL, 0);
+
         push_register(emitter, "rax");
     }
 }
@@ -496,7 +497,8 @@ void generate_variable(emitter_t *emitter, registers_t *regs, Slice *name, uint1
     else
     {
         // TODO: Check that the variable doesn't need to moved and change it
-        move_instruction(emitter, reg, base);
+        if (reg != base)
+            move_instruction(emitter, reg, base);
     }
 }
 

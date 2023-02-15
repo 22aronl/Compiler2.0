@@ -89,7 +89,8 @@ uint16_t available_registers(registers_t *reg, uint32_t statement_index)
         else if (!is_register_needed(reg, statement_index, reg->registers[i]))
         {
             // reg->registers[i] = -1;
-            return_register_to_memory(reg, i);
+            reg->registers[i] = -1;
+            //return_register_to_memory(reg, i);
             k++;
         }
     }
