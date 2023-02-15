@@ -373,7 +373,7 @@ void create_next_use_information(block_t *block, struct map *map, struct queue_h
     block->variables_size = 2;
     block->variables_index = 0;
 
-    if (block->has_jump && !block->unconditional_jump || block->is_while)
+    if ((block->has_jump && !block->unconditional_jump) || block->is_while)
     {
         next_use_expression(block->jump_expression, block, block->statement_size, queue);
     }
@@ -532,6 +532,11 @@ void generate_instruction(emitter_t *emitter, registers_t *regs, enum type_of ty
     case t_l:
         emit_reg_to_reg(emitter, "cmp %%%s, %%%s", emitter->registers[dest], emitter->registers[src]);
         emit(emitter, "setb \%al");
+        emit_reg_to_reg(emitter, "movzbq %%%s, %%%s", "al", emitter->registers[dest]);
+        break;
+    case t_g:
+        emit_reg_to_reg(emitter, "cmp %%%s, %%%s", emitter->registers[dest], emitter->registers[src]);
+        emit(emitter, "seta \%al");
         emit_reg_to_reg(emitter, "movzbq %%%s, %%%s", "al", emitter->registers[dest]);
         break;
     default:
