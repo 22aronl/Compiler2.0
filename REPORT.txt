@@ -25,5 +25,8 @@
   be stored in the executable file. If we remove the flag, the program will not be able to find the standard library functions in the executable.
   So, in this case, when I removed the flag, the code could not find the printf function and threw errors
 
+  Without the flag, it tries to dynamically find the method in memory with relative displacement. However, this leads to issues when printf in this case
+  is too far away to be retrieved.
+
   #https://gcc.gnu.org/onlinedocs/gcc/Link-Options.html
   #https://stackoverflow.com/questions/8692128/static-option-for-gcc
