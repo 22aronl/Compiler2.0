@@ -11,9 +11,9 @@ void force_reg_write(emitter_t *emitter)
     if (emitter->emit_instruction->in_use)
     {
         if (emitter->emit_instruction->pop)
-            printf("popq %%%s", emitter->emit_instruction->reg);
+            printf("popq %%%s\n", emitter->emit_instruction->reg);
         else
-            printf("pushq %%%s", emitter->emit_instruction->reg);
+            printf("pushq %%%s\n", emitter->emit_instruction->reg);
         emitter->emit_instruction->in_use = false;
     }
 }
