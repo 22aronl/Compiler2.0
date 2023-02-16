@@ -96,7 +96,7 @@ void push_register(emitter_t *emitter, char *name)
     else
     {
         printf("pushq %%%s\n", name);
-        emitter->emit_instruction->in_use = true;
+        //emitter->emit_instruction->in_use = true;
         emitter->emit_instruction->pop = false;
         emitter->emit_instruction->reg = name;
     }
@@ -122,7 +122,7 @@ void pop_register(emitter_t *emitter, char *name)
     else
     {
         printf("popq %%%s\n", name);
-        emitter->emit_instruction->in_use = true;
+        //emitter->emit_instruction->in_use = true;
         emitter->emit_instruction->pop = true;
         emitter->emit_instruction->reg = name;
     }
